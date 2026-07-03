@@ -30,6 +30,17 @@ static site plus a small Vercel serverless backend.
   `DOMContentLoaded` per page — **no build step**, it's plain static hosting. Don't edit
   `support.js` by hand (see its header comment — it's generated from a separate `dc-runtime`
   source you don't have here).
+- **`styles.css`** is the shared design system — a plain stylesheet (CSS custom properties for
+  color/spacing/radius/shadow tokens, plus reusable classes: `.page`/`.nav`/`.footer` shell,
+  `.card`, `.btn`/`.btn-primary`/`.btn-secondary`, `.input`/`.textarea`/`.field-label`,
+  `.segmented`/`.seg-btn`, `.swatches`/`.swatch`, `.price-row`, `.confirmation`, `.toggle`,
+  `.badge`, `.empty-state`) — linked from every page's `<helmet>` via
+  `<link rel="stylesheet" href="./styles.css">`. All 8 pages follow the same structural pattern:
+  `.page` > `.nav` > `.container`/`.container-narrow` (page content, usually a `.card.card-pad`
+  wrapping `.section` blocks) > `.footer`. When adding a new product page, copy this pattern
+  rather than writing new inline styles — extend `styles.css` with new shared classes if a need
+  recurs across pages, but keep page-specific one-offs (e.g. the keychain 3D preview canvas
+  sizing) in that page's own `<style>` block in `<helmet>`.
 - **`shared.js`** is a plain ES module (not a dc file) with the bits every page's Component class
   needs from the backend: `submitOrder`, `checkSession`, `loadOrders`, `togglePaid`, `staffLogin`,
   `staffLogout`, `download3MF`, plus `isValidOrder`/`COLORS`/`ACCENT` constants. Each page's class

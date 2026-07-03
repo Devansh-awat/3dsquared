@@ -13,79 +13,77 @@
 <helmet>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
   <style>
-    * { box-sizing: border-box; }
-    body { margin: 0; background: #0d0d0f; }
-    ::-webkit-scrollbar { width: 10px; height: 10px; }
-    ::-webkit-scrollbar-thumb { background: #2a2a2f; border-radius: 6px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    input, textarea, select, button { font-family: inherit; }
-    input::placeholder, textarea::placeholder { color: #6b6b72; }
+    .staff-row { display:grid; grid-template-columns: 1.2fr 1fr 2fr 1fr 1.4fr; }
+    @media (max-width: 900px) { .staff-row { grid-template-columns: 1fr; gap:6px; } }
   </style>
 </helmet>
 
-<div style="min-height: 100vh; background: #0d0d0f; color: #f2f2f0; font-family: -apple-system, 'Helvetica Neue', Helvetica, Arial, sans-serif;">
+<div class="page">
 
   <!-- NAV -->
-  <div style="display:flex; align-items:center; justify-content:space-between; padding: 18px 32px; border-bottom: 1px solid #232326; position:sticky; top:0; background:rgba(13,13,15,0.92); backdrop-filter: blur(8px); z-index:50; height:36px;">
-    <a href="/index.html" style="display:flex; align-items:center; gap:10px; text-decoration:none; color:inherit;">
-      <div style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:22px; letter-spacing:-0.02em;">3D<span style="color: oklch(0.7 0.16 25);">²</span></div>
-      <div style="font-size:12px; color:#8a8a90; letter-spacing:0.08em; text-transform:uppercase; margin-top:2px;">print studio</div>
+  <div class="nav">
+    <a href="/index.html" class="nav-brand">
+      <div class="nav-mark">3D<span>²</span></div>
+      <div class="nav-tag">print studio</div>
     </a>
-    <div style="display:flex; align-items:center; gap:24px;">
-      <a href="/index.html" style="font-size:14px; color:#c9c9cd; text-decoration:none;">Catalog</a>
-      <a href="/staff.html" style="font-size:14px; color:#c9c9cd; text-decoration:none; border:1px solid #2e2e32; padding:8px 16px; border-radius:6px;">Staff Login</a>
+    <div class="nav-links">
+      <a href="/index.html" class="nav-link">Catalog</a>
+      <a href="/staff.html" class="nav-cta">Staff Login</a>
     </div>
   </div>
 
   <!-- STAFF PANEL -->
-  <div style="max-width:1320px; margin:0 auto; padding:56px 32px 96px;">
+  <div class="container">
     <sc-if value="{{ staffLocked }}" hint-placeholder-val="{{ true }}">
-      <div style="max-width:380px; margin: 60px auto 0; background:#151517; border:1px solid #232326; border-radius:10px; padding:32px;">
+      <div class="card card-pad fade-up" style="max-width:380px; margin: 60px auto 0;">
         <div style="font-size:18px; font-weight:600; margin-bottom:6px;">Staff login</div>
-        <div style="font-size:12px; color:#8a8a90; margin-bottom:20px; line-height:1.5;">Enter the staff password to view and manage orders.</div>
-        <input type="password" value="{{ staffPwInput }}" onChange="{{ onStaffPwChange }}" placeholder="Password" style="width:100%; background:#0d0d0f; border:1px solid #2e2e32; color:#f2f2f0; padding:11px 14px; border-radius:7px; font-size:14px; margin-bottom:14px;"/>
-        <button style="width:100%; padding:12px; border-radius:7px; border:none; background: oklch(0.7 0.16 25); color:#161616; font-weight:600; font-size:14px; cursor:pointer;" onClick="{{ staffLogin }}">Enter</button>
+        <div style="font-size:12px; color:var(--text-faint); margin-bottom:22px; line-height:1.5;">Enter the staff password to view and manage orders.</div>
+        <div class="field">
+          <input type="password" value="{{ staffPwInput }}" onChange="{{ onStaffPwChange }}" placeholder="Password" class="input"/>
+        </div>
+        <button class="btn btn-primary btn-block" onClick="{{ staffLogin }}">Enter</button>
       </div>
     </sc-if>
 
     <sc-if value="{{ staffUnlocked }}" hint-placeholder-val="{{ false }}">
-      <div>
-        <div style="display:flex; align-items:baseline; justify-content:space-between; margin-bottom:24px;">
+      <div class="fade-up">
+        <div style="display:flex; align-items:baseline; justify-content:space-between; margin-bottom:26px; flex-wrap:wrap; gap:12px;">
           <div>
-            <div style="font-family:'Space Grotesk',sans-serif; font-size:26px; font-weight:600;">Orders</div>
-            <div style="font-size:12px; color:#8a8a90; margin-top:4px;">Synced from the orders database — visible to any staff member who logs in.</div>
+            <div class="h1" style="font-size:26px;">Orders</div>
+            <div style="font-size:12px; color:var(--text-faint); margin-top:6px;">Synced from the orders database — visible to any staff member who logs in.</div>
           </div>
           <div style="display:flex; align-items:center; gap:16px;">
-            <div style="font-size:13px; color:#c9c9cd;">{{ orderCount }} orders</div>
-            <div style="font-size:13px; color:#c9c9cd; cursor:pointer; border:1px solid #2e2e32; padding:8px 16px; border-radius:6px;" onClick="{{ staffLogout }}">Log out</div>
+            <div class="badge badge-neutral">{{ orderCount }} orders</div>
+            <div class="btn btn-secondary" style="padding:8px 16px; font-size:13px;" onClick="{{ staffLogout }}">Log out</div>
           </div>
         </div>
 
         <sc-if value="{{ hasOrders }}" hint-placeholder-val="{{ false }}">
-          <div style="border:1px solid #232326; border-radius:10px; overflow:hidden;">
-            <div style="display:grid; grid-template-columns: 1.2fr 1fr 2fr 1fr 1.4fr; background:#1a1a1d; padding:14px 20px; font-size:11px; text-transform:uppercase; letter-spacing:0.05em; color:#8a8a90;">
+          <div class="card" style="overflow:hidden;">
+            <div class="staff-row" style="background:var(--bg-elev-2); padding:14px 20px; font-size:11px; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-faint); font-weight:600;">
               <div>Customer</div><div>Object</div><div>Specs</div><div>Payment</div><div>Slicer file</div>
             </div>
             <sc-for list="{{ orders }}" as="order" hint-placeholder-count="3">
-              <div style="display:grid; grid-template-columns: 1.2fr 1fr 2fr 1fr 1.4fr; padding:16px 20px; border-top:1px solid #202023; font-size:13px; align-items:center;">
+              <div class="staff-row" style="padding:18px 20px; border-top:1px solid var(--border-soft); font-size:13px; align-items:center; transition: background 0.15s;">
                 <div>
                   <div style="font-weight:600;">{{ order.name }}</div>
-                  <div style="font-size:11px; color:#75757c;">{{ order.email }}</div>
+                  <div style="font-size:11px; color:var(--text-faint); margin-top:2px;">{{ order.email }}</div>
                 </div>
-                <div>{{ order.type }}</div>
-                <div style="color:#b0b0b6; font-size:12px; line-height:1.5;">{{ order.specsText }}</div>
+                <div><span class="badge badge-accent">{{ order.type }}</span></div>
+                <div style="color:var(--text-dim); font-size:12px; line-height:1.55;">{{ order.specsText }}</div>
                 <div>
-                  <div onClick="{{ order.onTogglePaid }}" style="width:44px; height:24px; border-radius:12px; cursor:pointer; background: {{ order.toggleBg }}; position:relative;">
-                    <div style="width:18px; height:18px; border-radius:50%; background:#fff; position:absolute; top:3px; left: {{ order.toggleLeft }}; transition: left 0.15s;"></div>
+                  <div onClick="{{ order.onTogglePaid }}" class="toggle" style="background: {{ order.toggleBg }};">
+                    <div class="toggle-knob" style="left: {{ order.toggleLeft }};"></div>
                   </div>
                 </div>
                 <div>
                   <sc-if value="{{ order.canDownload3MF }}" hint-placeholder-val="{{ false }}">
-                    <button style="background:#1f1f23; border:1px solid #2e2e32; color:#c9c9cd; padding:8px 12px; border-radius:6px; font-size:12px; cursor:pointer;" onClick="{{ order.onDownload }}">Download .3MF Slicer File</button>
+                    <button class="btn btn-secondary" style="padding:8px 12px; font-size:12px;" onClick="{{ order.onDownload }}">Download .3MF</button>
                   </sc-if>
                   <sc-if value="{{ order.cannotDownload3MF }}" hint-placeholder-val="{{ true }}">
-                    <div style="color:#5c5c62; font-size:12px;">Manual design — no file</div>
+                    <div style="color:var(--text-faint); font-size:12px;">Manual design — no file</div>
                   </sc-if>
                 </div>
               </div>
@@ -94,10 +92,21 @@
         </sc-if>
 
         <sc-if value="{{ noOrders }}" hint-placeholder-val="{{ true }}">
-          <div style="padding:60px; text-align:center; color:#6b6b72; font-size:13px; border:1px dashed #232326; border-radius:10px;">No orders yet.</div>
+          <div class="empty-state">No orders yet.</div>
         </sc-if>
       </div>
     </sc-if>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div class="footer-inner">
+      <div class="footer-brand">© 2026 3D² Print Studio — orders reviewed by hand, no payment collected online.</div>
+      <div class="footer-links">
+        <a href="/index.html">Catalog</a>
+        <a href="/staff.html">Staff</a>
+      </div>
+    </div>
   </div>
 
 </div>

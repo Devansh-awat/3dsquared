@@ -13,63 +13,75 @@
 <helmet>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-  <style>
-    * { box-sizing: border-box; }
-    body { margin: 0; background: #0d0d0f; }
-    ::-webkit-scrollbar { width: 10px; height: 10px; }
-    ::-webkit-scrollbar-thumb { background: #2a2a2f; border-radius: 6px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-  </style>
+  <link rel="stylesheet" href="./styles.css">
 </helmet>
 
-<div style="min-height: 100vh; background: #0d0d0f; color: #f2f2f0; font-family: -apple-system, 'Helvetica Neue', Helvetica, Arial, sans-serif;">
+<div class="page">
 
   <!-- NAV -->
-  <div style="display:flex; align-items:center; justify-content:space-between; padding: 18px 32px; border-bottom: 1px solid #232326; position:sticky; top:0; background:rgba(13,13,15,0.92); backdrop-filter: blur(8px); z-index:50; height:36px;">
-    <a href="/index.html" style="display:flex; align-items:center; gap:10px; text-decoration:none; color:inherit;">
-      <div style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:22px; letter-spacing:-0.02em;">3D<span style="color: oklch(0.7 0.16 25);">²</span></div>
-      <div style="font-size:12px; color:#8a8a90; letter-spacing:0.08em; text-transform:uppercase; margin-top:2px;">print studio</div>
+  <div class="nav">
+    <a href="/index.html" class="nav-brand">
+      <div class="nav-mark">3D<span>²</span></div>
+      <div class="nav-tag">print studio</div>
     </a>
-    <div style="display:flex; align-items:center; gap:24px;">
-      <a href="/index.html" style="font-size:14px; color:#c9c9cd; text-decoration:none;">Catalog</a>
-      <a href="/staff.html" style="font-size:14px; color:#c9c9cd; text-decoration:none; border:1px solid #2e2e32; padding:8px 16px; border-radius:6px;">Staff Login</a>
+    <div class="nav-links">
+      <a href="/index.html" class="nav-link">Catalog</a>
+      <a href="/staff.html" class="nav-cta">Staff Login</a>
     </div>
   </div>
 
   <!-- CATALOG -->
-  <div style="max-width:1320px; margin:0 auto; padding:56px 32px 96px;">
-    <div style="max-width:640px; margin-bottom:48px;">
-      <div style="font-family:'Space Grotesk',sans-serif; font-size:40px; font-weight:600; line-height:1.15; letter-spacing:-0.01em;">Custom 3D printing, made simple.</div>
-      <div style="font-size:16px; color:#9a9aa0; margin-top:14px; line-height:1.6;">Design your piece, preview it in real time, and we print it on-demand. Prices shown are starting points in INR.</div>
+  <div class="container">
+    <div class="fade-up" style="max-width:660px; margin-bottom:52px;">
+      <div class="badge badge-accent" style="margin-bottom:18px;">On-demand · pay on delivery/pickup</div>
+      <div class="h1" style="font-size:44px;">Custom 3D printing, made simple.</div>
+      <div class="lede" style="font-size:16.5px; margin-top:16px;">Design your piece, preview it in real time, and we print it on-demand. Prices shown are starting points in INR.</div>
     </div>
 
-    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:20px;">
+    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap:22px;">
       <sc-for list="{{ catalogItems }}" as="item" hint-placeholder-count="7">
-        <div style="background:#151517; border:1px solid #232326; border-radius:10px; overflow:hidden; display:flex; flex-direction:column; transition: border-color 0.15s;">
+        <a href="{{ item.href }}" class="card product-card fade-up" style="text-decoration:none; color:inherit; overflow:hidden; display:flex; flex-direction:column;">
           <sc-if value="{{ item.hasPhoto }}" hint-placeholder-val="{{ false }}">
-            <div style="height:180px; background:#101012;">
-              <img src="{{ item.photoUrl }}" style="width:100%; height:100%; object-fit:cover; display:block;"/>
+            <div style="height:180px; background:var(--bg-sunken); overflow:hidden;">
+              <img src="{{ item.photoUrl }}" class="product-photo-img" style="width:100%; height:100%; object-fit:cover; display:block; transition: transform 0.35s ease;"/>
             </div>
           </sc-if>
           <sc-if value="{{ item.hasNoPhoto }}" hint-placeholder-val="{{ true }}">
-            <div style="height:180px; background: repeating-linear-gradient(45deg, #1c1c1f, #1c1c1f 10px, #202023 10px, #202023 20px); display:flex; align-items:center; justify-content:center;">
-              <div style="font-family:'Courier New',monospace; font-size:12px; color:#6b6b72; letter-spacing:0.04em;">{{ item.photoLabel }}</div>
+            <div style="height:180px; background: repeating-linear-gradient(45deg, #17171a, #17171a 10px, #1c1c20 10px, #1c1c20 20px); display:flex; align-items:center; justify-content:center;">
+              <div style="font-family:'Courier New',monospace; font-size:11.5px; color:var(--text-faint); letter-spacing:0.05em;">{{ item.photoLabel }}</div>
             </div>
           </sc-if>
-          <div style="padding:20px; display:flex; flex-direction:column; gap:10px; flex:1;">
-            <div style="font-size:16px; font-weight:600;">{{ item.name }}</div>
-            <div style="font-size:13px; color:#8a8a90; line-height:1.5; flex:1;">{{ item.desc }}</div>
-            <div style="display:flex; align-items:center; justify-content:space-between; margin-top:8px;">
-              <div style="font-size:15px; font-weight:600; color: oklch(0.72 0.16 25);">{{ item.price }}</div>
-              <a href="{{ item.href }}" style="background: oklch(0.7 0.16 25); color:#161616; border:none; padding:9px 16px; border-radius:6px; font-size:13px; font-weight:600; cursor:pointer; text-decoration:none;">{{ item.cta }}</a>
+          <div style="padding:22px; display:flex; flex-direction:column; gap:10px; flex:1;">
+            <div style="font-size:16.5px; font-weight:600;">{{ item.name }}</div>
+            <div style="font-size:13px; color:var(--text-dim); line-height:1.55; flex:1;">{{ item.desc }}</div>
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-top:10px;">
+              <div style="font-size:15px; font-weight:600; color: var(--accent);">{{ item.price }}</div>
+              <div class="btn btn-primary" style="padding:9px 16px; font-size:13px;">{{ item.cta }}</div>
             </div>
           </div>
-        </div>
+        </a>
       </sc-for>
     </div>
   </div>
 
+  <!-- FOOTER -->
+  <div class="footer">
+    <div class="footer-inner">
+      <div class="footer-brand">© 2026 3D² Print Studio — orders reviewed by hand, no payment collected online.</div>
+      <div class="footer-links">
+        <a href="/index.html">Catalog</a>
+        <a href="/staff.html">Staff</a>
+      </div>
+    </div>
+  </div>
+
 </div>
+
+<style>
+  .product-card { transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease; }
+  .product-card:hover { border-color: var(--border-strong); transform: translateY(-3px); box-shadow: var(--shadow); }
+  .product-card:hover .product-photo-img { transform: scale(1.05); }
+</style>
 
 </x-dc>
 <script type="text/x-dc" data-dc-script>
