@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Custom Keychain — 3D² Print Studio</title>
+<title>Custom Keychain — 3D²</title>
 <link rel="icon" type="image/svg+xml" href="./favicon.svg">
 <script src="./support.js"></script>
 </head>
@@ -35,7 +35,6 @@
   <div class="nav">
     <a href="/index.html" class="nav-brand">
       <div class="nav-mark">3D<span>²</span></div>
-      <div class="nav-tag">print studio</div>
     </a>
     <div class="nav-links">
       <a href="/index.html" class="nav-link">Catalog</a>
@@ -133,12 +132,7 @@
           </sc-if>
           <div class="hint" style="margin-bottom:20px;">{{ kcStyleNote }}</div>
 
-          <div class="section" style="display:flex; align-items:center; justify-content:space-between;">
-            <div style="font-size:13.5px; color:var(--text-dim);">Chain link loop</div>
-            <div onClick="{{ onKcChainLinkToggle }}" class="toggle" style="background: {{ kcChainToggleBg }};">
-              <div class="toggle-knob" style="left: {{ kcChainToggleLeft }};"></div>
-            </div>
-          </div>
+
 
           <div class="section">
             <label class="field-label">Base color</label>
@@ -184,7 +178,7 @@
   <!-- FOOTER -->
   <div class="footer">
     <div class="footer-inner">
-      <div class="footer-brand">© 2026 3D² Print Studio — orders reviewed by hand, no payment collected online.</div>
+      <div class="footer-brand">© 2026 3D²</div>
       <div class="footer-links">
         <a href="/index.html">Catalog</a>
         <a href="/staff.html">Staff</a>
@@ -200,7 +194,7 @@
 class Component extends DCLogic {
   state = {
     confirmation: null,
-    kcText: '', kcSecondText: '', kcFontSize: 18, kcWordSpacing: 9, kcFontFamily: 'Pacifico', kcChainLink: true,
+    kcText: '', kcSecondText: '', kcFontSize: 18, kcWordSpacing: 9, kcFontFamily: 'Pacifico', kcChainLink: false,
     kcBaseColor: 'Black', kcTextColor: 'White', kcStyle: 'text', kcLogo: '',
     kcModelState: 'idle', kcModelError: null,
     kcName: '', kcEmail: '', kcPhone: '',
@@ -358,7 +352,7 @@ translate([2 * bore_size - chain_link_length, 0, 0]) difference() {
     scene.background = new THREE.Color(0x0a0a0c);
     const camera = new THREE.PerspectiveCamera(40, w / h, 0.1, 1000);
     const group = new THREE.Group();
-    group.rotation.x = -0.85;
+    group.rotation.x = -0.55;
     scene.add(group);
     scene.add(new THREE.AmbientLight(0xffffff, 0.7));
     const dl = new THREE.DirectionalLight(0xffffff, 0.9); dl.position.set(6, -8, 10); scene.add(dl);
@@ -443,7 +437,7 @@ translate([2 * bore_size - chain_link_length, 0, 0]) difference() {
     const size = new THREE.Vector3();
     refGeo.boundingBox.getSize(size);
     const maxDim = Math.max(size.x, size.y, size.z, 1);
-    this._camera.position.set(0, -maxDim * 1.1, maxDim * 1.9);
+    this._camera.position.set(0, -maxDim * 0.7, maxDim * 2.2);
     this._camera.near = maxDim * 0.01; this._camera.far = maxDim * 20;
     this._camera.up.set(0, 0, 1);
     this._camera.lookAt(0, 0, 0);
@@ -504,8 +498,6 @@ translate([2 * bore_size - chain_link_length, 0, 0]) difference() {
     const kcHasSecond = !!(s.kcSecondText && s.kcSecondText.trim());
     const kcShowSpacing = kcHasSecond;
     const kcPrice = 180 + (kcHasSecond ? 40 : 0);
-    const kcChainToggleBg = s.kcChainLink ? this.ACCENT : '#3a3a3f';
-    const kcChainToggleLeft = s.kcChainLink ? '23px' : '3px';
     const kcApproxLen = Math.max((s.kcText || '').trim().length, 3);
     const kcApproxW = Math.round(kcApproxLen * s.kcFontSize * 0.65 + this.KC_BASE_PAD * 2);
     const kcApproxD = Math.round(s.kcFontSize * (kcHasSecond ? 2.4 : 1.4) + this.KC_BASE_PAD * 2);
@@ -548,7 +540,7 @@ translate([2 * bore_size - chain_link_length, 0, 0]) difference() {
       kcPrice, kcPriceLabel: kcShowLogoField ? 'Base price' : 'Total', kcBaseSwatches, kcTextSwatches,
       kcStyleOptions, kcShowLogoField, kcShow3D, kcStyleNote, kcLogo: s.kcLogo,
       kcFontSize: s.kcFontSize, kcSecondText: s.kcSecondText, kcShowSpacing, kcWordSpacing: s.kcWordSpacing,
-      kcFontOptions, kcChainToggleBg, kcChainToggleLeft,
+      kcFontOptions,
       kcCanvasRef: this.kcCanvasRef, kcModelLoading, kcModelErrored, kcModelError: s.kcModelError,
       kcShowConfirmation: !!s.confirmation,
       kcShowForm: !s.confirmation,
@@ -558,7 +550,6 @@ translate([2 * bore_size - chain_link_length, 0, 0]) difference() {
       onKcSecondTextChange: (e) => { this.setState({ kcSecondText: e.target.value }); this.scheduleGenerate(); },
       onKcFontSizeChange: (e) => { this.setState({ kcFontSize: parseInt(e.target.value, 10) }); this.scheduleGenerate(); },
       onKcWordSpacingChange: (e) => { this.setState({ kcWordSpacing: parseInt(e.target.value, 10) }); this.scheduleGenerate(); },
-      onKcChainLinkToggle: () => { this.setState((st) => ({ kcChainLink: !st.kcChainLink })); this.scheduleGenerate(true); },
       onKcLogoChange: (e) => this.setState({ kcLogo: e.target.value }),
       onKcNameChange: (e) => this.setState({ kcName: e.target.value }),
       onKcEmailChange: (e) => this.setState({ kcEmail: e.target.value }),
@@ -567,9 +558,9 @@ translate([2 * bore_size - chain_link_length, 0, 0]) difference() {
         if (!kcValid) return;
         this.submitOrder({
           name: s.kcName, email: s.kcEmail, phone: s.kcPhone, type: 'Keychain',
-          specsText: `Line 1: "${s.kcText}"${kcHasSecond ? ' · Line 2: "' + s.kcSecondText + '"' : ''} · Style: ${s.kcStyle === 'text' ? 'Text only' : (s.kcStyle === 'logo_only' ? 'Logo only' : 'Name + Logo') + ' (' + s.kcLogo + ')'} · Font: ${s.kcFontFamily} ${s.kcFontSize}mm · Chain link: ${s.kcChainLink ? 'yes' : 'no'} · Base: ${s.kcBaseColor} · Text color: ${s.kcTextColor}`,
+          specsText: `Line 1: "${s.kcText}"${kcHasSecond ? ' · Line 2: "' + s.kcSecondText + '"' : ''} · Style: ${s.kcStyle === 'text' ? 'Text only' : (s.kcStyle === 'logo_only' ? 'Logo only' : 'Name + Logo') + ' (' + s.kcLogo + ')'} · Font: ${s.kcFontFamily} ${s.kcFontSize}mm · Base: ${s.kcBaseColor} · Text color: ${s.kcTextColor}`,
           price: kcShowLogoField ? null : kcPrice, baseColorHex: this.COLORS[s.kcBaseColor], textColorHex: this.COLORS[s.kcTextColor],
-          dims: { w: kcApproxW, d: kcApproxD, h: this.KC_BASE_H, textDepth: this.KC_TEXT_H, hole: s.kcChainLink },
+          dims: { w: kcApproxW, d: kcApproxD, h: this.KC_BASE_H, textDepth: this.KC_TEXT_H, hole: false },
         });
       },
     };
