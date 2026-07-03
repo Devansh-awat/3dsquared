@@ -1,0 +1,1202 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <script type="importmap">
+  { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" } }
+  </script>
+  <style>
+    @font-face { font-family: 'Pacifico'; src: url('./fonts/Pacifico.ttf') format('truetype'); font-weight: 400; font-style: normal; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #0d0d0f; }
+    ::-webkit-scrollbar { width: 10px; height: 10px; }
+    ::-webkit-scrollbar-thumb { background: #2a2a2f; border-radius: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    input, textarea, select, button { font-family: inherit; }
+    input::placeholder, textarea::placeholder { color: #6b6b72; }
+  </style>
+
+</helmet>
+
+<div style="min-height: 100vh; background: #0d0d0f; color: #f2f2f0; font-family: -apple-system, 'Helvetica Neue', Helvetica, Arial, sans-serif;">
+
+  <!-- NAV -->
+  <div style="display:flex; align-items:center; justify-content:space-between; padding: 18px 32px; border-bottom: 1px solid #232326; position:sticky; top:0; background:rgba(13,13,15,0.92); backdrop-filter: blur(8px); z-index:50; height:36px;">
+    <div style="display:flex; align-items:center; gap:10px; cursor:pointer;" onClick="{{ goCatalog }}">
+      <div style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:22px; letter-spacing:-0.02em;">3D<span style="color: oklch(0.7 0.16 25);">²</span></div>
+      <div style="font-size:12px; color:#8a8a90; letter-spacing:0.08em; text-transform:uppercase; margin-top:2px;">print studio</div>
+    </div>
+    <div style="display:flex; align-items:center; gap:24px;">
+      <div style="font-size:14px; color:#c9c9cd; cursor:pointer;" onClick="{{ goCatalog }}">Catalog</div>
+      <div style="font-size:14px; color:#c9c9cd; cursor:pointer; border:1px solid #2e2e32; padding:8px 16px; border-radius:6px;" onClick="{{ goStaff }}">Staff Login</div>
+    </div>
+  </div>
+
+  <!-- CATALOG -->
+  <sc-if value="{{ isCatalog }}" hint-placeholder-val="{{ true }}">
+    <div data-screen-label="Catalog" style="max-width:1320px; margin:0 auto; padding:56px 32px 96px;">
+      <div style="max-width:640px; margin-bottom:48px;">
+        <div style="font-family:'Space Grotesk',sans-serif; font-size:40px; font-weight:600; line-height:1.15; letter-spacing:-0.01em;">Custom 3D printing, made simple.</div>
+        <div style="font-size:16px; color:#9a9aa0; margin-top:14px; line-height:1.6;">Design your piece, preview it in real time, and we print it on-demand. Prices shown are starting points in INR.</div>
+      </div>
+
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:20px;">
+        <sc-for list="{{ catalogItems }}" as="item" hint-placeholder-count="5">
+          <div style="background:#151517; border:1px solid #232326; border-radius:10px; overflow:hidden; display:flex; flex-direction:column; transition: border-color 0.15s;">
+            <div style="height:180px; background: repeating-linear-gradient(45deg, #1c1c1f, #1c1c1f 10px, #202023 10px, #202023 20px); display:flex; align-items:center; justify-content:center;">
+              <div style="font-family:'Courier New',monospace; font-size:12px; color:#6b6b72; letter-spacing:0.04em;">{{ item.photoLabel }}</div>
+            </div>
+            <div style="padding:20px; display:flex; flex-direction:column; gap:10px; flex:1;">
+              <div style="font-size:16px; font-weight:600;">{{ item.name }}</div>
+              <div style="font-size:13px; color:#8a8a90; line-height:1.5; flex:1;">{{ item.desc }}</div>
+              <div style="display:flex; align-items:center; justify-content:space-between; margin-top:8px;">
+                <div style="font-size:15px; font-weight:600; color: oklch(0.72 0.16 25);">{{ item.price }}</div>
+                <button style="background: oklch(0.7 0.16 25); color:#161616; border:none; padding:9px 16px; border-radius:6px; font-size:13px; font-weight:600; cursor:pointer;" style-hover="background: oklch(0.75 0.16 25);" onClick="{{ item.onOpen }}">{{ item.cta }}</button>
+              </div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- KEYCHAIN CUSTOMIZER -->
+  <sc-if value="{{ isKeychain }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Keychain Customizer" style="max-width:640px; margin:0 auto; padding:56px 32px 96px;">
+      <div style="font-size:13px; color:#c9c9cd; cursor:pointer; margin-bottom:20px;" onClick="{{ goCatalog }}">← Back to catalog</div>
+      <div style="font-family:'Space Grotesk',sans-serif; font-size:26px; font-weight:600; margin-bottom:6px;">Custom Keychain</div>
+      <div style="font-size:13px; color:#8a8a90; margin-bottom:28px;">Personalize the text, size and colors below.</div>
+
+        <sc-if value="{{ kcShowConfirmation }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#12241a; border:1px solid #2a5a3f; border-radius:10px; padding:24px;">
+            <div style="font-size:16px; font-weight:600; color:#7fe0a8; margin-bottom:8px;">Order received ✓</div>
+            <div style="font-size:13px; color:#b8ccc0; line-height:1.6;">Order ID: {{ confirmation.id }}<br/>We'll follow up by email/phone to arrange payment and delivery. Payment is not collected on this site.</div>
+            <button style="margin-top:18px; background:transparent; border:1px solid #3a6a4f; color:#c9c9cd; padding:10px 18px; border-radius:6px; font-size:13px; cursor:pointer;" onClick="{{ goCatalog }}">Back to catalog</button>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ kcShowForm }}" hint-placeholder-val="{{ true }}">
+          <div>
+            <div style="margin-bottom:24px;">
+              <sc-if value="{{ kcShow3D }}" hint-placeholder-val="{{ true }}">
+                <div style="position:relative; height:280px; background:#0a0a0c; border-radius:12px; overflow:hidden; cursor:grab;">
+                  <canvas ref="{{ kcCanvasRef }}" style="width:100%; height:100%; display:block;"></canvas>
+                  <sc-if value="{{ kcModelLoading }}" hint-placeholder-val="{{ true }}">
+                    <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:12px; color:#8a8a90; background:rgba(10,10,12,0.55); pointer-events:none;">Rendering 3D model in your browser…</div>
+                  </sc-if>
+                  <sc-if value="{{ kcModelErrored }}" hint-placeholder-val="{{ false }}">
+                    <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:12px; color:#e08a8a; text-align:center; padding:16px; background:rgba(10,10,12,0.85);">{{ kcModelError }}</div>
+                  </sc-if>
+                </div>
+                <div style="font-size:11px; color:#5c5c62; text-align:center; margin-top:8px;">Live 3D preview, compiled in your browser from our parametric OpenSCAD design — drag to rotate.</div>
+              </sc-if>
+              <sc-if value="{{ kcShowLogoField }}" hint-placeholder-val="{{ false }}">
+                <div style="padding:32px 20px; background:#101012; border:1px dashed #232326; border-radius:12px; text-align:center; font-size:12px; color:#6b6b72;">Logo pieces are modeled by hand — no automatic 3D preview for this style.</div>
+              </sc-if>
+            </div>
+
+            <div style="font-size:12px; color:#8a8a90; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;">Line 1</div>
+            <input value="{{ kcText }}" onChange="{{ onKcTextChange }}" maxlength="16" placeholder="Type the name or word to engrave" style="width:100%; background:#0d0d0f; border:1px solid #2e2e32; color:#f2f2f0; padding:12px 14px; border-radius:7px; font-size:15px; margin-bottom:20px;"/>
+
+            <div style="font-size:12px; color:#8a8a90; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;">Line 2 (optional)</div>
+            <input value="{{ kcSecondText }}" onChange="{{ onKcSecondTextChange }}" maxlength="16" placeholder="e.g. a date, or a second name" style="width:100%; background:#0d0d0f; border:1px solid #2e2e32; color:#f2f2f0; padding:11px 14px; border-radius:7px; font-size:14px; margin-bottom:20px;"/>
+
+            <sc-if value="{{ kcShowSpacing }}" hint-placeholder-val="{{ false }}">
+              <div style="font-size:12px; color:#8a8a90; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;">Line spacing</div>
+              <div style="display:flex; align-items:center; gap:12px; margin-bottom:20px;">
+                <input type="range" min="4" max="20" step="1" value="{{ kcWordSpacing }}" onChange="{{ onKcWordSpacingChange }}" style="flex:1; accent-color: oklch(0.7 0.16 25);"/>
+                <div style="font-size:13px; color:#c9c9cd; width:44px; text-align:right;">{{ kcWordSpacing }}mm</div>
+              </div>
+            </sc-if>
+
+            <div style="font-size:12px; color:#8a8a90; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;">Font size</div>
+            <div style="display:flex; align-items:center; gap:12px; margin-bottom:20px;">
+              <input type="range" min="12" max="28" step="1" value="{{ kcFontSize }}" onChange="{{ onKcFontSizeChange }}" style="flex:1; accent-color: oklch(0.7 0.16 25);"/>
+              <div style="font-size:13px; color:#c9c9cd; width:44px; text-align:right;">{{ kcFontSize }}mm</div>
+            </div>
+
+            <div style="font-size:12px; color:#8a8a90; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;">Font</div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:24px;">
+              <sc-for list="{{ kcFontOptions }}" as="opt" hint-placeholder-count="1">
+                <button style="padding:10px 16px; border-radius:7px; font-size:14px; cursor:pointer; background: {{ opt.bg }}; border: 1px solid {{ opt.border }}; color: {{ opt.color }}; font-family: {{ opt.previewFont }};" onClick="{{ opt.onClick }}">{{ opt.label }}</button>
+              </sc-for>
+            </div>
+
+            <div style="font-size:12px; color:#8a8a90; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;">Style</div>
+            <div style="display:flex; gap:10px; margin-bottom:12px;">
+              <sc-for list="{{ kcStyleOptions }}" as="opt" hint-placeholder-count="3">
+                <button style="flex:1; padding:12px 8px; border-radius:7px; font-size:13px; cursor:pointer; background: {{ opt.bg }}; border: 1px solid {{ opt.border }}; color: {{ opt.color }};" onClick="{{ opt.onClick }}">{{ opt.label }}</button>
+              </sc-for>
+            </div>
+
+            <sc-if value="{{ kcShowLogoField }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-bottom:12px;">
+                <input value="{{ kcLogo }}" onChange="{{ onKcLogoChange }}" placeholder="Which logo? e.g. CSK, Apple, Brawl Stars" style="width:100%; background:#0d0d0f; border:1px solid #2e2e32; color:#f2f2f0; padding:12px 14px; border-radius:7px; font-size:14px;"/>
+              </div>
+            </sc-if>
+            <div style="font-size:11px; color:#6b6b72; margin-bottom:24px;">{{ kcStyleNote }}</div>
+
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:24px;">
+              <div style="font-size:13px; color:#c9c9cd;">Chain link loop</div>
+              <div onClick="{{ onKcChainLinkToggle }}" style="width:44px; height:24px; border-radius:12px; cursor:pointer; background: {{ kcChainToggleBg }}; position:relative;">
+                <div style="width:18px; height:18px; border-radius:50%; background:#fff; position:absolute; top:3px; left: {{ kcChainToggleLeft }}; transition: left 0.15s;"></div>
+              </div>
+            </div>
+
+            <div style="font-size:12px; color:#8a8a90; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;">Base color</div>
+            <div style="display:flex; gap:14px; margin-bottom:24px;">
+              <sc-for list="{{ kcBaseSwatches }}" as="sw" hint-placeholder-count="4">
+                <div onClick="{{ sw.onClick }}" title="{{ sw.name }}" style="width:36px; height:36px; border-radius:50%; background:{{ sw.hex }}; cursor:pointer; border: 3px solid {{ sw.ring }}; box-shadow: 0 0 0 1px #000 inset;"></div>
+              </sc-for>
+            </div>
+
+            <div style="font-size:12px; color:#8a8a90; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;">Text color</div>
+            <div style="display:flex; gap:14px; margin-bottom:28px;">
+              <sc-for list="{{ kcTextSwatches }}" as="sw" hint-placeholder-count="4">
+                <div onClick="{{ sw.onClick }}" title="{{ sw.name }}" style="width:36px; height:36px; border-radius:50%; background:{{ sw.hex }}; cursor:pointer; border: 3px solid {{ sw.ring }}; box-shadow: 0 0 0 1px #000 inset;"></div>
+              </sc-for>
+            </div>
+
+            <div style="height:1px; background:#232326; margin: 8px 0 24px;"></div>
+
+            <div style="font-size:12px; color:#8a8a90; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:10px;">Your details</div>
+            <input value="{{ kcName }}" onChange="{{ onKcNameChange }}" placeholder="Full name" style="width:100%; background:#0d0d0f; border:1px solid #2e2e32; color:#f2f2f0; padding:11px 14px; border-radius:7px; font-size:14px; margin-bottom:10px;"/>
+            <input value="{{ kcEmail }}" onChange="{{ onKcEmailChange }}" placeholder="Email" style="width:100%; background:#0d0d0f; border:1px solid #2e2e32; color:#f2f2f0; padding:11px 14px; border-radius:7px; font-size:14px; margin-bottom:10px;"/>
+            <input value="{{ kcPhone }}" onChange="{{ onKcPhoneChange }}" placeholder="Phone number" style="width:100%; background:#0d0d0f; border:1px solid #2e2e32; color:#f2f2f0; padding:11px 14px; border-radius:7px; font-size:14px; margin-bottom:24px;"/>
+
+            <div style="display:flex; align-items:center; justify-content:space-between; padding:18px 20px; background:#0d0d0f; border:1px solid #232326; border-radius:9px; margin-bottom:8px;">
+              <div style="font-size:13px; color:#9a9aa0;">{{ kcPriceLabel }}</div>
+              <div style="font-size:22px; font-weight:700; font-family:'Space Grotesk',sans-serif;">₹{{ kcPrice }}</div>
+            </div>
+            <sc-if value="{{ kcShowLogoField }}" hint-placeholder-val="{{ false }}">
+              <div style="font-size:11px; color:#6b6b72; margin-bottom:16px;">Plus a logo design fee, quoted after we review your logo.</div>
+            </sc-if>
+
+            <button disabled="{{ kcSubmitDisabled }}" style="width:100%; padding:14px; border-radius:8px; border:none; font-size:14px; font-weight:600; cursor:pointer; background: {{ kcSubmitBg }}; color: {{ kcSubmitColor }};" onClick="{{ submitKeychain }}">Checkout — pay on delivery/pickup</button>
+          </div>
+        </sc-if>
+    </div>
+  </sc-if>
+
+  <!-- BOOKMARK CUSTOMIZER -->
+  <sc-if value="{{ isBookmark }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Bookmark Customizer" style="max-width:640px; margin:0 auto; padding:56px 32px 96px;">
+      <div style="font-size:13px; color:#c9c9cd; cursor:pointer; margin-bottom:20px;" onClick="{{ goCatalog }}">← Back to catalog</div>
+      <div style="font-family:'Space Grotesk',sans-serif; font-size:26px; font-weight:600; margin-bottom:6px;">Custom Bookmark</div>
+      <div style="font-size:13px; color:#8a8a90; margin-bottom:28px;">Personalize the text, size and colors below.</div>
+
+        <sc-if value="{{ bmShowConfirmation }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#12241a; border:1px solid #2a5a3f; border-radius:10px; padding:24px;">
+            <div style="font-size:16px; font-weight:600; color:#7fe0a8; margin-bottom:8px;">Order received ✓</div>
+            <div style="font-size:13px; color:#b8ccc0; line-height:1.6;">Order ID: {{ confirmation.id }}<br/>We'll follow up by email/phone to arrange payment and delivery. Payment is not collected on this site.</div>
+            <button style="margin-top:18px; background:transparent; border:1px solid #3a6a4f; color:#c9c9cd; padding:10px 18px; border-radius:6px; font-size:13px; cursor:pointer;" onClick="{{ goCatalog }}">Back to catalog</button>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ bmShowForm }}" hint-placeholder-val="{{ true }}">
+          <div>
+            <div style="font-size:12px; color:#8a8a90; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;">Engraved text</div>
+            <input value="{{ bmText }}" onChange="{{ onBmTextChange }}" maxlength="16" placeholder="Type the name or word to engrave" style="width:100%; background:#0d0d0f; border:1px solid #2e2e32; color:#f2f2f0; padding:12px 14px; border-radius:7px; font-size:15px; margin-bottom:24px;"/>
+
+            <div style="font-size:12px; color:#8a8a90; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;">Base color</div>
+            <div style="display:flex; gap:14px; margin-bottom:24px;">
+              <sc-for list="{{ bmBaseSwatches }}" as="sw" hint-placeholder-count="4">
+                <div onClick="{{ sw.onClick }}" title="{{ sw.name }}" style="width:36px; height:36px; border-radius:50%; background:{{ sw.hex }}; cursor:pointer; border: 3px solid {{ sw.ring }}; box-shadow: 0 0 0 1px #000 inset;"></div>
+              </sc-for>
+            </div>
+
+            <div style="font-size:12px; color:#8a8a90; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;">Text color</div>
+            <div style="display:flex; gap:14px; margin-bottom:28px;">
+              <sc-for list="{{ bmTextSwatches }}" as="sw" hint-placeholder-count="4">
+                <div onClick="{{ sw.onClick }}" title="{{ sw.name }}" style="width:36px; height:36px; border-radius:50%; background:{{ sw.hex }}; cursor:pointer; border: 3px solid {{ sw.ring }}; box-shadow: 0 0 0 1px #000 inset;"></div>
+              </sc-for>
+            </div>
+
+            <div style="height:1px; background:#232326; margin: 8px 0 24px;"></div>
+
+            <div style="font-size:12px; color:#8a8a90; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:10px;">Your details</div>
+            <input value="{{ bmName }}" onChange="{{ onBmNameChange }}" placeholder="Full name" style="width:100%; background:#0d0d0f; border:1px solid #2e2e32; color:#f2f2f0; padding:11px 14px; border-radius:7px; font-size:14px; margin-bottom:10px;"/>
+            <input value="{{ bmEmail }}" onChange="{{ onBmEmailChange }}" placeholder="Email" style="width:100%; background:#0d0d0f; border:1px solid #2e2e32; color:#f2f2f0; padding:11px 14px; border-radius:7px; font-size:14px; margin-bottom:10px;"/>
+            <input value="{{ bmPhone }}" onChange="{{ onBmPhoneChange }}" placeholder="Phone number" style="width:100%; background:#0d0d0f; border:1px solid #2e2e32; color:#f2f2f0; padding:11px 14px; border-radius:7px; font-size:14px; margin-bottom:24px;"/>
+
+            <div style="display:flex; align-items:center; justify-content:space-between; padding:18px 20px; background:#0d0d0f; border:1px solid #232326; border-radius:9px; margin-bottom:16px;">
+              <div style="font-size:13px; color:#9a9aa0;">Total</div>
+              <div style="font-size:22px; font-weight:700; font-family:'Space Grotesk',sans-serif;">₹{{ bmPrice }}</div>
+            </div>
+
+            <button disabled="{{ bmSubmitDisabled }}" style="width:100%; padding:14px; border-radius:8px; border:none; font-size:14px; font-weight:600; cursor:pointer; background: {{ bmSubmitBg }}; color: {{ bmSubmitColor }};" onClick="{{ submitBookmark }}">Checkout — pay on delivery/pickup</button>
+          </div>
+        </sc-if>
+    </div>
+  </sc-if>
+
+  <!-- KEYCAP FIDGET TOY -->
+  <sc-if value="{{ isKeycap }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Keycap Fidget Toy" style="max-width:640px; margin:0 auto; padding:56px 32px 96px;">
+      <div style="font-size:13px; color:#c9c9cd; cursor:pointer; margin-bottom:20px;" onClick="{{ goCatalog }}">← Back to catalog</div>
+      <div style="font-family:'Space Grotesk',sans-serif; font-size:26px; font-weight:600; margin-bottom:6px;">Keycap Fidget Toy</div>
+      <div style="font-size:13px; color:#8a8a90; margin-bottom:28px;">A row of clicky keycaps in a housing — one keycap per letter of a name or word.</div>
+
+      <sc-if value="{{ kfShowConfirmation }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#12241a; border:1px solid #2a5a3f; border-radius:10px; padding:24px;">
+          <div style="font-size:16px; font-weight:600; color:#7fe0a8; margin-bottom:8px;">Order received ✓</div>
+          <div style="font-size:13px; color:#b8ccc0; line-height:1.6;">Order ID: {{ confirmation.id }}<br/>We'll follow up by email/phone to arrange payment and delivery. Payment is not collected on this site.</div>
+          <button style="margin-top:18px; background:transparent; border:1px solid #3a6a4f; color:#c9c9cd; padding:10px 18px; border-radius:6px; font-size:13px; cursor:pointer;" onClick="{{ goCatalog }}">Back to catalog</button>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ kfShowForm }}" hint-placeholder-val="{{ true }}">
+        <div>
+          <div style="font-size:12px; color:#8a8a90; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;">Name or nickname</div>
+          <input value="{{ kfText }}" onChange="{{ onKfTextChange }}" maxlength="12" placeholder="Each letter becomes one keycap" style="width:100%; background:#0d0d0f; border:1px solid #2e2e32; color:#f2f2f0; padding:12px 14px; border-radius:7px; font-size:15px; margin-bottom:10px;"/>
+          <div style="font-size:12px; color:#8a8a90; margin-bottom:24px;">{{ kfCountText }}</div>
+
+          <div style="font-size:12px; color:#8a8a90; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;">Housing color</div>
+          <div style="display:flex; gap:14px; margin-bottom:24px;">
+            <sc-for list="{{ kfHousingSwatches }}" as="sw" hint-placeholder-count="4">
+              <div onClick="{{ sw.onClick }}" title="{{ sw.name }}" style="width:36px; height:36px; border-radius:50%; background:{{ sw.hex }}; cursor:pointer; border: 3px solid {{ sw.ring }}; box-shadow: 0 0 0 1px #000 inset;"></div>
+            </sc-for>
+          </div>
+
+          <div style="font-size:12px; color:#8a8a90; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;">Keycap color</div>
+          <div style="display:flex; gap:14px; margin-bottom:28px;">
+            <sc-for list="{{ kfKeycapSwatches }}" as="sw" hint-placeholder-count="4">
+              <div onClick="{{ sw.onClick }}" title="{{ sw.name }}" style="width:36px; height:36px; border-radius:50%; background:{{ sw.hex }}; cursor:pointer; border: 3px solid {{ sw.ring }}; box-shadow: 0 0 0 1px #000 inset;"></div>
+            </sc-for>
+          </div>
+
+          <div style="height:1px; background:#232326; margin: 8px 0 24px;"></div>
+
+          <div style="font-size:12px; color:#8a8a90; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:10px;">Your details</div>
+          <input value="{{ kfName }}" onChange="{{ onKfNameChange }}" placeholder="Full name" style="width:100%; background:#0d0d0f; border:1px solid #2e2e32; color:#f2f2f0; padding:11px 14px; border-radius:7px; font-size:14px; margin-bottom:10px;"/>
+          <input value="{{ kfEmail }}" onChange="{{ onKfEmailChange }}" placeholder="Email" style="width:100%; background:#0d0d0f; border:1px solid #2e2e32; color:#f2f2f0; padding:11px 14px; border-radius:7px; font-size:14px; margin-bottom:10px;"/>
+          <input value="{{ kfPhone }}" onChange="{{ onKfPhoneChange }}" placeholder="Phone number" style="width:100%; background:#0d0d0f; border:1px solid #2e2e32; color:#f2f2f0; padding:11px 14px; border-radius:7px; font-size:14px; margin-bottom:24px;"/>
+
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:18px 20px; background:#0d0d0f; border:1px solid #232326; border-radius:9px; margin-bottom:16px;">
+            <div style="font-size:13px; color:#9a9aa0;">Total</div>
+            <div style="font-size:22px; font-weight:700; font-family:'Space Grotesk',sans-serif;">₹{{ kfPrice }}</div>
+          </div>
+
+          <button disabled="{{ kfSubmitDisabled }}" style="width:100%; padding:14px; border-radius:8px; border:none; font-size:14px; font-weight:600; cursor:pointer; background: {{ kfSubmitBg }}; color: {{ kfSubmitColor }};" onClick="{{ submitKeycap }}">Checkout — pay on delivery/pickup</button>
+        </div>
+      </sc-if>
+    </div>
+  </sc-if>
+
+  <!-- PS5 HOLDER -->
+  <sc-if value="{{ isPs5 }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="PS5 Holder Order" style="max-width:640px; margin:0 auto; padding:56px 32px 96px;">
+      <div style="font-size:13px; color:#c9c9cd; cursor:pointer; margin-bottom:20px;" onClick="{{ goCatalog }}">← Back to catalog</div>
+      <div style="font-family:'Space Grotesk',sans-serif; font-size:26px; font-weight:600; margin-bottom:6px;">PS5 Controller / Holder</div>
+      <div style="font-size:13px; color:#8a8a90; margin-bottom:28px;">Tell us your finish preferences — this fits the standard PS5 controller.</div>
+
+      <sc-if value="{{ ps5ShowConfirmation }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#12241a; border:1px solid #2a5a3f; border-radius:10px; padding:24px;">
+          <div style="font-size:16px; font-weight:600; color:#7fe0a8; margin-bottom:8px;">Order received ✓</div>
+          <div style="font-size:13px; color:#b8ccc0; line-height:1.6;">Order ID: {{ confirmation.id }}<br/>We'll follow up by email/phone to arrange payment and delivery. Payment is not collected on this site.</div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ ps5ShowForm }}" hint-placeholder-val="{{ true }}">
+        <div>
+          <div style="font-size:12px; color:#8a8a90; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;">Describe the design & colors for each part</div>
+          <textarea value="{{ ps5Theme }}" onChange="{{ onPs5ThemeChange }}" placeholder="e.g. Marvel theme — base: red, accents: gold, logo: black. Describe as much detail as you can per part." rows="5" style="width:100%; background:#0d0d0f; border:1px solid #2e2e32; color:#f2f2f0; padding:12px 14px; border-radius:7px; font-size:14px; margin-bottom:24px; resize:vertical;"></textarea>
+
+          <div style="font-size:12px; color:#8a8a90; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:10px;">Your details</div>
+          <input value="{{ ps5Name }}" onChange="{{ onPs5NameChange }}" placeholder="Full name" style="width:100%; background:#0d0d0f; border:1px solid #2e2e32; color:#f2f2f0; padding:11px 14px; border-radius:7px; font-size:14px; margin-bottom:10px;"/>
+          <input value="{{ ps5Email }}" onChange="{{ onPs5EmailChange }}" placeholder="Email" style="width:100%; background:#0d0d0f; border:1px solid #2e2e32; color:#f2f2f0; padding:11px 14px; border-radius:7px; font-size:14px; margin-bottom:10px;"/>
+          <input value="{{ ps5Phone }}" onChange="{{ onPs5PhoneChange }}" placeholder="Phone number" style="width:100%; background:#0d0d0f; border:1px solid #2e2e32; color:#f2f2f0; padding:11px 14px; border-radius:7px; font-size:14px; margin-bottom:24px;"/>
+
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:18px 20px; background:#151517; border:1px solid #232326; border-radius:9px; margin-bottom:8px;">
+            <div style="font-size:13px; color:#9a9aa0;">Starting price</div>
+            <div style="font-size:22px; font-weight:700; font-family:'Space Grotesk',sans-serif;">From ₹300</div>
+          </div>
+          <div style="font-size:11px; color:#6b6b72; margin-bottom:16px;">Final price depends on the complexity of the holder — quoted after we review your design.</div>
+          <button disabled="{{ ps5SubmitDisabled }}" style="width:100%; padding:14px; border-radius:8px; border:none; font-size:14px; font-weight:600; cursor:pointer; background: {{ ps5SubmitBg }}; color: {{ ps5SubmitColor }};" onClick="{{ submitPs5 }}">Submit order request</button>
+        </div>
+      </sc-if>
+    </div>
+  </sc-if>
+
+  <!-- FIGURINE -->
+  <sc-if value="{{ isFigurine }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Figurine Order" style="max-width:640px; margin:0 auto; padding:56px 32px 96px;">
+      <div style="font-size:13px; color:#c9c9cd; cursor:pointer; margin-bottom:20px;" onClick="{{ goCatalog }}">← Back to catalog</div>
+      <div style="font-family:'Space Grotesk',sans-serif; font-size:26px; font-weight:600; margin-bottom:6px;">Action Figures / Mini Figures</div>
+      <div style="font-size:13px; color:#8a8a90; margin-bottom:28px;">Describe what you'd like — our team confirms final price and details before printing.</div>
+
+      <sc-if value="{{ figShowConfirmation }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#12241a; border:1px solid #2a5a3f; border-radius:10px; padding:24px;">
+          <div style="font-size:16px; font-weight:600; color:#7fe0a8; margin-bottom:8px;">Request received ✓</div>
+          <div style="font-size:13px; color:#b8ccc0; line-height:1.6;">Order ID: {{ confirmation.id }}<br/>We'll follow up by email/phone to confirm final price and details. Payment is not collected on this site.</div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ figShowForm }}" hint-placeholder-val="{{ true }}">
+        <div>
+          <div style="font-size:12px; color:#8a8a90; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;">Which figure?</div>
+          <input value="{{ figWhat }}" onChange="{{ onFigWhatChange }}" placeholder="e.g. Custom action figure of my dog" style="width:100%; background:#0d0d0f; border:1px solid #2e2e32; color:#f2f2f0; padding:12px 14px; border-radius:7px; font-size:14px; margin-bottom:24px;"/>
+
+          <div style="font-size:12px; color:#8a8a90; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;">Colors — per part</div>
+          <textarea value="{{ figColorDesc }}" onChange="{{ onFigColorChange }}" placeholder="e.g. body: red, base: black, eyes: white" rows="3" style="width:100%; background:#0d0d0f; border:1px solid #2e2e32; color:#f2f2f0; padding:12px 14px; border-radius:7px; font-size:14px; margin-bottom:24px; resize:vertical;"></textarea>
+
+          <div style="font-size:12px; color:#8a8a90; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;">Size (height)</div>
+          <div style="display:flex; gap:10px; margin-bottom:24px;">
+            <sc-for list="{{ figSizeOptions }}" as="opt" hint-placeholder-count="3">
+              <button style="flex:1; padding:12px 8px; border-radius:7px; font-size:13px; cursor:pointer; background: {{ opt.bg }}; border: 1px solid {{ opt.border }}; color: {{ opt.color }};" onClick="{{ opt.onClick }}">
+                <div style="font-weight:600;">{{ opt.label }}</div>
+                <div style="font-size:12px; opacity:0.8; margin-top:2px;">Above ₹{{ opt.price }}</div>
+              </button>
+            </sc-for>
+          </div>
+
+          <div style="font-size:12px; color:#8a8a90; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:10px;">Your details</div>
+          <input value="{{ figName }}" onChange="{{ onFigNameChange }}" placeholder="Full name" style="width:100%; background:#0d0d0f; border:1px solid #2e2e32; color:#f2f2f0; padding:11px 14px; border-radius:7px; font-size:14px; margin-bottom:10px;"/>
+          <input value="{{ figEmail }}" onChange="{{ onFigEmailChange }}" placeholder="Email" style="width:100%; background:#0d0d0f; border:1px solid #2e2e32; color:#f2f2f0; padding:11px 14px; border-radius:7px; font-size:14px; margin-bottom:10px;"/>
+          <input value="{{ figPhone }}" onChange="{{ onFigPhoneChange }}" placeholder="Phone number" style="width:100%; background:#0d0d0f; border:1px solid #2e2e32; color:#f2f2f0; padding:11px 14px; border-radius:7px; font-size:14px; margin-bottom:24px;"/>
+
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:18px 20px; background:#151517; border:1px solid #232326; border-radius:9px; margin-bottom:8px;">
+            <div style="font-size:13px; color:#9a9aa0;">Starting price</div>
+            <div style="font-size:22px; font-weight:700; font-family:'Space Grotesk',sans-serif;">Above ₹{{ figPrice }}</div>
+          </div>
+          <div style="font-size:11px; color:#6b6b72; margin-bottom:16px;">Final price depends on chosen color.</div>
+          <button disabled="{{ figSubmitDisabled }}" style="width:100%; padding:14px; border-radius:8px; border:none; font-size:14px; font-weight:600; cursor:pointer; background: {{ figSubmitBg }}; color: {{ figSubmitColor }};" onClick="{{ submitFigurine }}">Submit order request</button>
+        </div>
+      </sc-if>
+    </div>
+  </sc-if>
+
+  <!-- LOGO -->
+  <sc-if value="{{ isLogo }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Logo Order" style="max-width:640px; margin:0 auto; padding:56px 32px 96px;">
+      <div style="font-size:13px; color:#c9c9cd; cursor:pointer; margin-bottom:20px;" onClick="{{ goCatalog }}">← Back to catalog</div>
+      <div style="font-family:'Space Grotesk',sans-serif; font-size:26px; font-weight:600; margin-bottom:6px;">Custom Logos / Boards</div>
+      <div style="font-size:13px; color:#8a8a90; margin-bottom:28px;">Any logo or brand mark — sports teams, companies, games. Tell us which one and how to color it.</div>
+
+      <sc-if value="{{ logoShowConfirmation }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#12241a; border:1px solid #2a5a3f; border-radius:10px; padding:24px;">
+          <div style="font-size:16px; font-weight:600; color:#7fe0a8; margin-bottom:8px;">Request received ✓</div>
+          <div style="font-size:13px; color:#b8ccc0; line-height:1.6;">Order ID: {{ confirmation.id }}<br/>We'll follow up by email/phone to confirm final price and details. Payment is not collected on this site.</div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ logoShowForm }}" hint-placeholder-val="{{ true }}">
+        <div>
+          <div style="font-size:12px; color:#8a8a90; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;">Logo or brand name</div>
+          <input value="{{ logoBrand }}" onChange="{{ onLogoBrandChange }}" placeholder="e.g. CSK, Apple, Brawl Stars" style="width:100%; background:#0d0d0f; border:1px solid #2e2e32; color:#f2f2f0; padding:12px 14px; border-radius:7px; font-size:14px; margin-bottom:24px;"/>
+
+          <div style="font-size:12px; color:#8a8a90; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;">Colors (optional — leave blank to use the brand's own colors)</div>
+          <textarea value="{{ logoColorDesc }}" onChange="{{ onLogoColorChange }}" placeholder="e.g. ring: gold, letters: black" rows="3" style="width:100%; background:#0d0d0f; border:1px solid #2e2e32; color:#f2f2f0; padding:12px 14px; border-radius:7px; font-size:14px; margin-bottom:24px; resize:vertical;"></textarea>
+
+          <div style="font-size:12px; color:#8a8a90; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;">Size (length)</div>
+          <div style="display:flex; gap:10px; margin-bottom:24px;">
+            <sc-for list="{{ logoSizeOptions }}" as="opt" hint-placeholder-count="3">
+              <button style="flex:1; padding:12px 8px; border-radius:7px; font-size:13px; cursor:pointer; background: {{ opt.bg }}; border: 1px solid {{ opt.border }}; color: {{ opt.color }};" onClick="{{ opt.onClick }}">{{ opt.label }}</button>
+            </sc-for>
+          </div>
+
+          <div style="font-size:12px; color:#8a8a90; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:10px;">Your details</div>
+          <input value="{{ logoName }}" onChange="{{ onLogoNameChange }}" placeholder="Full name" style="width:100%; background:#0d0d0f; border:1px solid #2e2e32; color:#f2f2f0; padding:11px 14px; border-radius:7px; font-size:14px; margin-bottom:10px;"/>
+          <input value="{{ logoEmail }}" onChange="{{ onLogoEmailChange }}" placeholder="Email" style="width:100%; background:#0d0d0f; border:1px solid #2e2e32; color:#f2f2f0; padding:11px 14px; border-radius:7px; font-size:14px; margin-bottom:10px;"/>
+          <input value="{{ logoPhone }}" onChange="{{ onLogoPhoneChange }}" placeholder="Phone number" style="width:100%; background:#0d0d0f; border:1px solid #2e2e32; color:#f2f2f0; padding:11px 14px; border-radius:7px; font-size:14px; margin-bottom:24px;"/>
+
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:18px 20px; background:#151517; border:1px solid #232326; border-radius:9px; margin-bottom:16px;">
+            <div style="font-size:13px; color:#9a9aa0;">Starting price</div>
+            <div style="font-size:22px; font-weight:700; font-family:'Space Grotesk',sans-serif;">₹200</div>
+          </div>
+          <button disabled="{{ logoSubmitDisabled }}" style="width:100%; padding:14px; border-radius:8px; border:none; font-size:14px; font-weight:600; cursor:pointer; background: {{ logoSubmitBg }}; color: {{ logoSubmitColor }};" onClick="{{ submitLogo }}">Submit order request</button>
+        </div>
+      </sc-if>
+    </div>
+  </sc-if>
+
+  <!-- OTHER / CUSTOM REQUEST -->
+  <sc-if value="{{ isOther }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Custom Request" style="max-width:640px; margin:0 auto; padding:56px 32px 96px;">
+      <div style="font-size:13px; color:#c9c9cd; cursor:pointer; margin-bottom:20px;" onClick="{{ goCatalog }}">← Back to catalog</div>
+      <div style="font-family:'Space Grotesk',sans-serif; font-size:26px; font-weight:600; margin-bottom:6px;">Something else?</div>
+      <div style="font-size:13px; color:#8a8a90; margin-bottom:28px;">Describe what you'd like printed — we'll quote a price and follow up.</div>
+
+      <sc-if value="{{ otherShowConfirmation }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#12241a; border:1px solid #2a5a3f; border-radius:10px; padding:24px;">
+          <div style="font-size:16px; font-weight:600; color:#7fe0a8; margin-bottom:8px;">Request received ✓</div>
+          <div style="font-size:13px; color:#b8ccc0; line-height:1.6;">Order ID: {{ confirmation.id }}<br/>We'll follow up by email/phone to confirm price and details. Payment is not collected on this site.</div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ otherShowForm }}" hint-placeholder-val="{{ true }}">
+        <div>
+          <div style="font-size:12px; color:#8a8a90; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;">What would you like?</div>
+          <textarea value="{{ otherDesc }}" onChange="{{ onOtherDescChange }}" placeholder="Describe the item, size, colors — anything that helps us quote it" rows="5" style="width:100%; background:#0d0d0f; border:1px solid #2e2e32; color:#f2f2f0; padding:12px 14px; border-radius:7px; font-size:14px; margin-bottom:24px; resize:vertical;"></textarea>
+
+          <div style="font-size:12px; color:#8a8a90; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:10px;">Your details</div>
+          <input value="{{ otherName }}" onChange="{{ onOtherNameChange }}" placeholder="Full name" style="width:100%; background:#0d0d0f; border:1px solid #2e2e32; color:#f2f2f0; padding:11px 14px; border-radius:7px; font-size:14px; margin-bottom:10px;"/>
+          <input value="{{ otherEmail }}" onChange="{{ onOtherEmailChange }}" placeholder="Email" style="width:100%; background:#0d0d0f; border:1px solid #2e2e32; color:#f2f2f0; padding:11px 14px; border-radius:7px; font-size:14px; margin-bottom:10px;"/>
+          <input value="{{ otherPhone }}" onChange="{{ onOtherPhoneChange }}" placeholder="Phone number" style="width:100%; background:#0d0d0f; border:1px solid #2e2e32; color:#f2f2f0; padding:11px 14px; border-radius:7px; font-size:14px; margin-bottom:24px;"/>
+
+          <div style="padding:18px 20px; background:#151517; border:1px solid #232326; border-radius:9px; margin-bottom:16px; font-size:13px; color:#9a9aa0;">Price quoted after we review your request.</div>
+          <button disabled="{{ otherSubmitDisabled }}" style="width:100%; padding:14px; border-radius:8px; border:none; font-size:14px; font-weight:600; cursor:pointer; background: {{ otherSubmitBg }}; color: {{ otherSubmitColor }};" onClick="{{ submitOther }}">Submit request</button>
+        </div>
+      </sc-if>
+    </div>
+  </sc-if>
+
+  <!-- STAFF PANEL -->
+  <sc-if value="{{ isStaff }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Staff Panel" style="max-width:1320px; margin:0 auto; padding:56px 32px 96px;">
+      <sc-if value="{{ staffLocked }}" hint-placeholder-val="{{ true }}">
+        <div style="max-width:380px; margin: 60px auto 0; background:#151517; border:1px solid #232326; border-radius:10px; padding:32px;">
+          <div style="font-size:18px; font-weight:600; margin-bottom:6px;">Staff login</div>
+          <div style="font-size:12px; color:#8a8a90; margin-bottom:20px; line-height:1.5;">Prototype-only client-side gate. This must be replaced with real server-side authentication before going live.</div>
+          <input type="password" value="{{ staffPwInput }}" onChange="{{ onStaffPwChange }}" placeholder="Password" style="width:100%; background:#0d0d0f; border:1px solid #2e2e32; color:#f2f2f0; padding:11px 14px; border-radius:7px; font-size:14px; margin-bottom:14px;"/>
+          <button style="width:100%; padding:12px; border-radius:7px; border:none; background: oklch(0.7 0.16 25); color:#161616; font-weight:600; font-size:14px; cursor:pointer;" onClick="{{ staffLogin }}">Enter</button>
+          <div style="font-size:11px; color:#5c5c62; margin-top:14px;">demo password: staff123</div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ staffUnlocked }}" hint-placeholder-val="{{ false }}">
+        <div>
+          <div style="display:flex; align-items:baseline; justify-content:space-between; margin-bottom:24px;">
+            <div>
+              <div style="font-family:'Space Grotesk',sans-serif; font-size:26px; font-weight:600;">Orders</div>
+              <div style="font-size:12px; color:#8a8a90; margin-top:4px;">Client-side demo data only — connect a real backend for persistence across staff/devices.</div>
+            </div>
+            <div style="font-size:13px; color:#c9c9cd;">{{ orderCount }} orders</div>
+          </div>
+
+          <sc-if value="{{ hasOrders }}" hint-placeholder-val="{{ false }}">
+            <div style="border:1px solid #232326; border-radius:10px; overflow:hidden;">
+              <div style="display:grid; grid-template-columns: 1.2fr 1fr 2fr 1fr 1.4fr; background:#1a1a1d; padding:14px 20px; font-size:11px; text-transform:uppercase; letter-spacing:0.05em; color:#8a8a90;">
+                <div>Customer</div><div>Object</div><div>Specs</div><div>Payment</div><div>Slicer file</div>
+              </div>
+              <sc-for list="{{ orders }}" as="order" hint-placeholder-count="3">
+                <div style="display:grid; grid-template-columns: 1.2fr 1fr 2fr 1fr 1.4fr; padding:16px 20px; border-top:1px solid #202023; font-size:13px; align-items:center;">
+                  <div>
+                    <div style="font-weight:600;">{{ order.name }}</div>
+                    <div style="font-size:11px; color:#75757c;">{{ order.email }}</div>
+                  </div>
+                  <div>{{ order.type }}</div>
+                  <div style="color:#b0b0b6; font-size:12px; line-height:1.5;">{{ order.specsText }}</div>
+                  <div>
+                    <div onClick="{{ order.onTogglePaid }}" style="width:44px; height:24px; border-radius:12px; cursor:pointer; background: {{ order.toggleBg }}; position:relative;">
+                      <div style="width:18px; height:18px; border-radius:50%; background:#fff; position:absolute; top:3px; left: {{ order.toggleLeft }}; transition: left 0.15s;"></div>
+                    </div>
+                  </div>
+                  <div>
+                    <button style="background:#1f1f23; border:1px solid #2e2e32; color:#c9c9cd; padding:8px 12px; border-radius:6px; font-size:12px; cursor:pointer;" onClick="{{ order.onDownload }}">Download .3MF Slicer File</button>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ noOrders }}" hint-placeholder-val="{{ true }}">
+            <div style="padding:60px; text-align:center; color:#6b6b72; font-size:13px; border:1px dashed #232326; border-radius:10px;">No orders yet.</div>
+          </sc-if>
+        </div>
+      </sc-if>
+    </div>
+  </sc-if>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+
+class Component extends DCLogic {
+  state = {
+    page: 'catalog',
+    staffAuthed: false,
+    staffPwInput: '',
+    orders: [],
+    confirmation: null,
+
+    kcText: '', kcSecondText: '', kcFontSize: 18, kcWordSpacing: 9, kcFontFamily: 'Pacifico', kcChainLink: true,
+    kcBaseColor: 'Black', kcTextColor: 'White', kcStyle: 'text', kcLogo: '',
+    kcModelState: 'idle', kcModelError: null,
+    kcName: '', kcEmail: '', kcPhone: '',
+
+    kfText: '', kfHousingColor: 'Black', kfKeycapColor: 'White',
+    kfName: '', kfEmail: '', kfPhone: '',
+
+    bmText: '', bmSize: 'M', bmBaseColor: 'Black', bmTextColor: 'White',
+    bmName: '', bmEmail: '', bmPhone: '',
+
+    figWhat: '', figColorDesc: '', figSize: '5',
+    figName: '', figEmail: '', figPhone: '',
+
+    logoItem: 'Keychain', logoBrand: '', logoColorDesc: '', logoSize: '10 cm',
+    logoName: '', logoEmail: '', logoPhone: '',
+
+    ps5Theme: '', ps5Color: '', ps5Name: '', ps5Email: '', ps5Phone: '',
+
+    otherDesc: '', otherName: '', otherEmail: '', otherPhone: '',
+  };
+
+  COLORS = { Red: '#D64545', Blue: '#3B6FD6', Black: '#1B1B1B', White: '#F4F4F2' };
+  COLOR_NAMES = ['Red', 'Blue', 'Black', 'White'];
+  BM_PRICES = { S: 100, M: 130, L: 160 };
+  FIG_PRICES = { '3': 250, '5': 350, '7': 400 };
+  ACCENT = 'oklch(0.7 0.16 25)';
+
+  // Fixed per your instruction — not user-tweakable.
+  KC_BASE_H = 2.5;
+  KC_CONTOUR_H = 1.2;
+  KC_TEXT_H = 1.5;
+  KC_BASE_PAD = 4;
+  KC_CONTOUR_PAD = 2;
+
+  // Registry of fonts available for the keychain preview. Add more entries here
+  // (and upload the matching .ttf into fonts/) to offer more choices.
+  KC_FONTS = {
+    Pacifico: { file: './fonts/Pacifico.ttf', scadName: 'Pacifico:style=Regular', previewCss: "'Pacifico', cursive" },
+  };
+
+  kcCanvasRef = (node) => {
+    this._canvasNode = node;
+    if (node) this.initThree(node);
+    else this.disposeThree();
+  };
+
+  scadEscape(str) {
+    return String(str).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+  }
+
+  // Each layer (base / contour / text / chain link) is compiled as its OWN
+  // independent OpenSCAD program and combined only in three.js — never unioned
+  // inside OpenSCAD, since a second offset()+extrude() unioned in the same compile
+  // is extremely expensive on the CGAL backend with a cursive font (~20s vs ~100ms
+  // for a single offset). Stacking the independent solids visually reproduces the
+  // original design's layered look without needing any CSG boolean.
+  buildKcDrawTextModule(p) {
+    const font = this.KC_FONTS[p.fontKey] || this.KC_FONTS.Pacifico;
+    const t1 = this.scadEscape(p.text);
+    const hasSecond = !!(p.secondText && p.secondText.trim());
+    if (hasSecond) {
+      const t2 = this.scadEscape(p.secondText.trim());
+      return `
+module draw_text() {
+  translate([0, ${p.wordSpacing}]) text("${t1}", size=${p.fontSize}, font="${font.scadName}", valign="center");
+  translate([0, ${-p.wordSpacing}]) text("${t2}", size=${p.fontSize}, font="${font.scadName}", valign="center");
+}
+`;
+    }
+    return `
+module draw_text() {
+  text("${t1}", size=${p.fontSize}, font="${font.scadName}", valign="center");
+}
+`;
+  }
+
+  buildKcScadCommon(p) {
+    const font = this.KC_FONTS[p.fontKey] || this.KC_FONTS.Pacifico;
+    return `use <${font.file.replace('./', '')}>\n$fn = 20;\n` + this.buildKcDrawTextModule(p);
+  }
+
+  buildKcBaseScad(p) {
+    return this.buildKcScadCommon(p) + `
+linear_extrude(height=${this.KC_BASE_H}) offset(r=${this.KC_BASE_PAD}) draw_text();
+`;
+  }
+
+  buildKcContourScad(p) {
+    return this.buildKcScadCommon(p) + `
+linear_extrude(height=${this.KC_BASE_H + this.KC_CONTOUR_H}) offset(r=${this.KC_CONTOUR_PAD}) draw_text();
+`;
+  }
+
+  buildKcTextScad(p) {
+    return this.buildKcScadCommon(p) + `
+translate([0, 0, ${this.KC_BASE_H + this.KC_CONTOUR_H}]) linear_extrude(height=${this.KC_TEXT_H}) draw_text();
+`;
+  }
+
+  buildKcChainScad() {
+    const bore = this.KC_BASE_PAD * 1.5, chainLen = bore * 2, h = this.KC_BASE_H;
+    return `
+$fn = 24;
+bore_size = ${bore}; chain_link_length = ${chainLen}; base_height = ${h};
+translate([2 * bore_size - chain_link_length, 0, 0]) difference() {
+  hull() {
+    translate([-bore_size, 0, 0]) cylinder(h=base_height, r=bore_size, center=false);
+    translate([-bore_size, -bore_size, 0]) cube([chain_link_length, bore_size * 2, base_height], false);
+  }
+  translate([-bore_size, 0, 0]) cylinder(h=base_height * 2, r=bore_size / 2, center=true);
+}
+`;
+  }
+
+  getOpenSCADModule() {
+    if (!this._oscadModPromise) {
+      this._oscadModPromise = import('https://cdn.jsdelivr.net/npm/openscad-wasm@0.0.4/openscad.js');
+    }
+    return this._oscadModPromise;
+  }
+
+  getFontBytes(fontKey) {
+    if (!this._fontBufCache) this._fontBufCache = {};
+    if (!this._fontBufCache[fontKey]) {
+      const font = this.KC_FONTS[fontKey] || this.KC_FONTS.Pacifico;
+      this._fontBufCache[fontKey] = fetch(font.file)
+        .then((r) => r.arrayBuffer())
+        .then((buf) => new Uint8Array(buf));
+    }
+    return this._fontBufCache[fontKey];
+  }
+
+  // OpenSCAD's WASM main() exits its runtime after one callMain — a second call on
+  // the same instance aborts. So each compile gets its own fresh instance (~1s to
+  // spin up, but keeps every render reliable).
+  async renderScad(code, fontKey) {
+    const font = this.KC_FONTS[fontKey] || this.KC_FONTS.Pacifico;
+    const mod = await this.getOpenSCADModule();
+    const inst = await mod.createOpenSCAD({ noInitialRun: true });
+    const fontBuf = await this.getFontBytes(fontKey);
+    const FS = inst.getInstance().FS;
+    try { FS.mkdir('/fonts'); } catch (e) {}
+    FS.writeFile(font.file.replace('./', '/'), fontBuf);
+    return inst.renderToStl(code);
+  }
+
+  ensureThree() {
+    if (!this._threeModPromise) {
+      this._threeModPromise = (async () => {
+        const THREE = await import('three');
+        const { STLLoader } = await import('https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/STLLoader.js');
+        return { THREE, STLLoader };
+      })();
+    }
+    return this._threeModPromise;
+  }
+
+  async initThree(canvas) {
+    const { THREE, STLLoader } = await this.ensureThree();
+    if (this._canvasNode !== canvas) return;
+    this._THREE = THREE;
+    this._STLLoader = STLLoader;
+    const w = canvas.clientWidth || 400, h = canvas.clientHeight || 280;
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, preserveDrawingBuffer: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setSize(w, h, false);
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x0a0a0c);
+    const camera = new THREE.PerspectiveCamera(40, w / h, 0.1, 1000);
+    const group = new THREE.Group();
+    group.rotation.x = -0.85;
+    scene.add(group);
+    scene.add(new THREE.AmbientLight(0xffffff, 0.7));
+    const dl = new THREE.DirectionalLight(0xffffff, 0.9); dl.position.set(6, -8, 10); scene.add(dl);
+    const dl2 = new THREE.DirectionalLight(0xffffff, 0.3); dl2.position.set(-6, 8, -4); scene.add(dl2);
+
+    this._renderer = renderer; this._scene = scene; this._camera = camera; this._group = group;
+
+    let dragging = false, lastX = 0, lastY = 0;
+    const onDown = (e) => { dragging = true; lastX = e.clientX; lastY = e.clientY; canvas.style.cursor = 'grabbing'; };
+    const onMove = (e) => {
+      if (!dragging) return;
+      const dx = e.clientX - lastX, dy = e.clientY - lastY;
+      lastX = e.clientX; lastY = e.clientY;
+      group.rotation.z += dx * 0.008;
+      group.rotation.x = Math.max(-1.4, Math.min(0.3, group.rotation.x + dy * 0.008));
+    };
+    const onUp = () => { dragging = false; canvas.style.cursor = 'grab'; };
+    canvas.addEventListener('pointerdown', onDown);
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup', onUp);
+    this._cleanupDrag = () => {
+      canvas.removeEventListener('pointerdown', onDown);
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onUp);
+    };
+
+    const loop = () => {
+      this._rafId = requestAnimationFrame(loop);
+      renderer.render(scene, camera);
+    };
+    loop();
+
+    this.scheduleGenerate(true);
+  }
+
+  disposeThree() {
+    if (this._rafId) cancelAnimationFrame(this._rafId);
+    if (this._cleanupDrag) this._cleanupDrag();
+    if (this._renderer) this._renderer.dispose();
+    this._renderer = null; this._scene = null; this._camera = null; this._group = null;
+    this._meshA = null; this._meshB = null;
+  }
+
+  scheduleGenerate(immediate) {
+    if (this._genTimer) clearTimeout(this._genTimer);
+    this._genTimer = setTimeout(() => this.generateModel(), immediate ? 0 : 500);
+  }
+
+  recolorMeshes(baseName, textName) {
+    if (!this._meshes) return;
+    const b = baseName || this.state.kcBaseColor, t = textName || this.state.kcTextColor;
+    this._meshes.forEach((m) => {
+      m.material.color.set(this.COLORS[m.userData.key === 'text' ? t : b]);
+    });
+  }
+
+  applyMeshes(layers) {
+    const THREE = this._THREE;
+    if (this._meshes) {
+      this._meshes.forEach((m) => { this._group.remove(m); m.geometry.dispose(); });
+    }
+    this._meshes = [];
+    let refGeo = null;
+    layers.forEach((layer) => {
+      const loader = new this._STLLoader();
+      const geo = loader.parse(new TextEncoder().encode(layer.stl).buffer);
+      geo.computeVertexNormals();
+      const mat = new THREE.MeshStandardMaterial({ color: layer.colorHex, roughness: layer.key === 'text' ? 0.4 : 0.55, metalness: 0.05, side: THREE.DoubleSide });
+      const mesh = new THREE.Mesh(geo, mat);
+      mesh.userData.key = layer.key;
+      this._group.add(mesh);
+      this._meshes.push(mesh);
+      if (layer.key === 'base') refGeo = geo;
+    });
+    if (!refGeo) refGeo = this._meshes[0].geometry;
+
+    refGeo.computeBoundingBox();
+    const center = new THREE.Vector3();
+    refGeo.boundingBox.getCenter(center);
+    this._meshes.forEach((m) => m.position.set(-center.x, -center.y, -center.z));
+
+    const size = new THREE.Vector3();
+    refGeo.boundingBox.getSize(size);
+    const maxDim = Math.max(size.x, size.y, size.z, 1);
+    this._camera.position.set(0, -maxDim * 1.1, maxDim * 1.9);
+    this._camera.near = maxDim * 0.01; this._camera.far = maxDim * 20;
+    this._camera.up.set(0, 0, 1);
+    this._camera.lookAt(0, 0, 0);
+    this._camera.updateProjectionMatrix();
+  }
+
+  async generateModel() {
+    if (!this._scene) return;
+    if (this.state.kcStyle !== 'text') { this.setState({ kcModelState: 'idle' }); return; }
+    const token = (this._genToken = (this._genToken || 0) + 1);
+    const s = this.state;
+    const params = {
+      text: (s.kcText || '').trim() || 'Name',
+      secondText: s.kcSecondText,
+      fontSize: s.kcFontSize,
+      wordSpacing: s.kcWordSpacing,
+      fontKey: s.kcFontFamily,
+    };
+    this.setState({ kcModelState: 'loading', kcModelError: null });
+    await new Promise((r) => setTimeout(r, 0)); // let the loading overlay paint before the blocking compile
+    if (token !== this._genToken || !this._scene) return;
+    try {
+      const jobs = [
+        { key: 'base', code: this.buildKcBaseScad(params), colorHex: this.COLORS[s.kcBaseColor] },
+        { key: 'contour', code: this.buildKcContourScad(params), colorHex: this.COLORS[s.kcBaseColor] },
+        { key: 'text', code: this.buildKcTextScad(params), colorHex: this.COLORS[s.kcTextColor] },
+      ];
+      if (s.kcChainLink) jobs.push({ key: 'chain', code: this.buildKcChainScad(), colorHex: this.COLORS[s.kcBaseColor] });
+
+      const layers = [];
+      for (const job of jobs) {
+        const stl = await this.renderScad(job.code, params.fontKey);
+        if (token !== this._genToken || !this._scene) return;
+        layers.push({ stl, colorHex: job.colorHex, key: job.key });
+      }
+      this.applyMeshes(layers);
+      this.setState({ kcModelState: 'ready' });
+    } catch (e) {
+      if (token !== this._genToken) return;
+      this.setState({ kcModelState: 'error', kcModelError: 'Preview unavailable — ' + (e && e.message ? e.message : 'render failed') });
+    }
+  }
+
+  BM_BASE_H = 2;
+  BM_DIMS = {
+    S: { w: 28, d: 85, hole: true },
+    M: { w: 32, d: 100, hole: true },
+    L: { w: 38, d: 120, hole: true },
+  };
+
+  componentDidMount() {
+    try {
+      const saved = JSON.parse(localStorage.getItem('td2_orders') || '[]');
+      this.setState({ orders: saved });
+    } catch (e) {}
+  }
+
+  isValidOrder(name, email, phone) {
+    return !!(name && name.trim() && /\S+@\S+\.\S+/.test(email || '') && phone && phone.trim().length >= 7);
+  }
+
+  saveOrders(orders) {
+    localStorage.setItem('td2_orders', JSON.stringify(orders));
+    this.setState({ orders });
+  }
+
+  submitOrder(order) {
+    const full = { id: 'TD2-' + Date.now().toString(36).toUpperCase(), createdAt: new Date().toISOString(), paid: false, ...order };
+    this.saveOrders([full, ...this.state.orders]);
+    this.setState({ confirmation: full });
+  }
+
+  togglePaid(id) {
+    const orders = this.state.orders.map(o => o.id === id ? { ...o, paid: !o.paid } : o);
+    this.saveOrders(orders);
+  }
+
+  // ---------------- .3MF export (see mf3-writer.js for geometry generation) ----------------
+  async download3MF(order) {
+    const mod = await import('./mf3-writer.js');
+    const d = order.dims || { w: 50, d: 25, h: 3, textDepth: 1.2, hole: true };
+    const blob = mod.generate3MFBlob({
+      widthMM: d.w, depthMM: d.d, heightMM: d.h, textHeightMM: d.textDepth,
+      baseColorHex: order.baseColorHex || '#1B1B1B',
+      textColorHex: order.textColorHex || '#F4F4F2',
+      hasHole: !!d.hole,
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = (order.id || 'order') + '.3mf';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
+  }
+
+  renderVals() {
+    const s = this.state;
+    const goTo = (page) => this.setState({ page, confirmation: null });
+
+    const catalogItems = [
+      { key: 'keychain', name: 'Custom Keychain', price: 'From ₹180', cta: 'Customize', photoLabel: 'PRODUCT PHOTO — KEYCHAIN', desc: 'Engrave any name or word — pick a font, size and colors.', onOpen: () => goTo('keychain') },
+      { key: 'bookmark', name: 'Custom Bookmark', price: '₹200', cta: 'Customize', photoLabel: 'PRODUCT PHOTO — BOOKMARK', desc: 'Engrave any name or word, pick colors.', onOpen: () => goTo('bookmark') },
+      { key: 'keycap', name: 'Keycap Fidget Toy', price: 'From ₹300', cta: 'Customize', photoLabel: 'PRODUCT PHOTO — KEYCAP FIDGET', desc: 'A row of clicky keycaps in a housing — one per letter of a name or word.', onOpen: () => goTo('keycap') },
+      { key: 'ps5', name: 'PS5 Controller / Holder', price: 'From ₹300', cta: 'Order now', photoLabel: 'PRODUCT PHOTO — PS5 HOLDER', desc: 'Sturdy stand for controller, sized for standard PS5 controllers. Final price depends on design complexity.', onOpen: () => goTo('ps5') },
+      { key: 'figurine', name: 'Action Figures / Mini Figures', price: 'From ₹250', cta: 'Order now', photoLabel: 'PRODUCT PHOTO — FIGURINE', desc: 'Custom mini figures — describe the character, colors and size.', onOpen: () => goTo('figurine') },
+      { key: 'logo', name: 'Custom Logos / Boards', price: 'From ₹200', cta: 'Order now', photoLabel: 'PRODUCT PHOTO — LOGO / BOARD', desc: 'Any logo or brand mark, printed on a keychain, plaque or board.', onOpen: () => goTo('logo') },
+      { key: 'other', name: 'Something else?', price: 'Custom quote', cta: 'Describe your idea', photoLabel: 'PRODUCT PHOTO — YOUR IDEA', desc: "Don't see what you need — tell us what you'd like printed.", onOpen: () => goTo('other') },
+    ];
+
+    // ---- Keychain ----
+    const kcHasSecond = !!(s.kcSecondText && s.kcSecondText.trim());
+    const kcShowSpacing = kcHasSecond;
+    const kcPrice = 180 + (kcHasSecond ? 40 : 0);
+    const kcChainToggleBg = s.kcChainLink ? this.ACCENT : '#3a3a3f';
+    const kcChainToggleLeft = s.kcChainLink ? '23px' : '3px';
+    const kcApproxLen = Math.max((s.kcText || '').trim().length, 3);
+    const kcApproxW = Math.round(kcApproxLen * s.kcFontSize * 0.65 + this.KC_BASE_PAD * 2);
+    const kcApproxD = Math.round(s.kcFontSize * (kcHasSecond ? 2.4 : 1.4) + this.KC_BASE_PAD * 2);
+    const kcFontOptions = Object.keys(this.KC_FONTS).map(key => ({
+      label: key,
+      previewFont: this.KC_FONTS[key].previewCss,
+      bg: s.kcFontFamily === key ? this.ACCENT : '#0d0d0f',
+      color: s.kcFontFamily === key ? '#161616' : '#c9c9cd',
+      border: s.kcFontFamily === key ? this.ACCENT : '#2e2e32',
+      onClick: () => { this.setState({ kcFontFamily: key }); this.scheduleGenerate(true); },
+    }));
+    const kcBaseSwatches = this.COLOR_NAMES.map(name => ({
+      name, hex: this.COLORS[name],
+      ring: s.kcBaseColor === name ? this.ACCENT : '#2e2e32',
+      onClick: () => { this.setState({ kcBaseColor: name }); this.recolorMeshes(name, undefined); },
+    }));
+    const kcTextSwatches = this.COLOR_NAMES.map(name => ({
+      name, hex: this.COLORS[name],
+      ring: s.kcTextColor === name ? this.ACCENT : '#2e2e32',
+      onClick: () => { this.setState({ kcTextColor: name }); this.recolorMeshes(undefined, name); },
+    }));
+    const kcStyleOptions = [
+      { key: 'text', label: 'Text only' },
+      { key: 'name_logo', label: 'Name + Logo' },
+      { key: 'logo_only', label: 'Logo only' },
+    ].map(o => ({
+      label: o.label,
+      bg: s.kcStyle === o.key ? this.ACCENT : '#0d0d0f',
+      color: s.kcStyle === o.key ? '#161616' : '#c9c9cd',
+      border: s.kcStyle === o.key ? this.ACCENT : '#2e2e32',
+      onClick: () => { this.setState({ kcStyle: o.key }); this.scheduleGenerate(true); },
+    }));
+    const kcShowLogoField = s.kcStyle !== 'text';
+    const kcShow3D = s.kcStyle === 'text';
+    const kcStyleNote = kcShowLogoField
+      ? 'Logo pieces are modeled individually by hand (not generated from the parametric text file). The logo design fee depends on the logo itself and is confirmed after we review it.'
+      : 'Generated directly from our parametric keychain design.';
+    const kcModelLoading = s.kcModelState === 'loading';
+    const kcModelErrored = s.kcModelState === 'error';
+    const kcValid = this.isValidOrder(s.kcName, s.kcEmail, s.kcPhone) && (!kcShowLogoField || s.kcLogo.trim());
+
+    // ---- Keycap Fidget Toy ----
+    const kfLetters = (s.kfText.match(/\S/g) || []).length;
+    const kfPrice = kfLetters > 0 ? (kfLetters <= 3 ? 300 : 300 + 70 * (kfLetters - 3)) : 300;
+    const kfCountText = kfLetters > 0
+      ? `${kfLetters} keycap${kfLetters === 1 ? '' : 's'} — ₹300 for 3 letters, +₹70 per extra letter`
+      : 'Enter a name to see keycap count and price (₹300 for 3 letters, +₹70 per extra letter)';
+    const kfHousingSwatches = this.COLOR_NAMES.map(name => ({
+      name, hex: this.COLORS[name],
+      ring: s.kfHousingColor === name ? this.ACCENT : '#2e2e32',
+      onClick: () => this.setState({ kfHousingColor: name }),
+    }));
+    const kfKeycapSwatches = this.COLOR_NAMES.map(name => ({
+      name, hex: this.COLORS[name],
+      ring: s.kfKeycapColor === name ? this.ACCENT : '#2e2e32',
+      onClick: () => this.setState({ kfKeycapColor: name }),
+    }));
+    const kfValid = this.isValidOrder(s.kfName, s.kfEmail, s.kfPhone) && kfLetters > 0;
+
+    // ---- Bookmark ----
+    const bmDims = this.BM_DIMS.M;
+    const bmPrice = 200;
+    const bmBaseSwatches = this.COLOR_NAMES.map(name => ({
+      name, hex: this.COLORS[name],
+      ring: s.bmBaseColor === name ? this.ACCENT : '#2e2e32',
+      onClick: () => this.setState({ bmBaseColor: name }),
+    }));
+    const bmTextSwatches = this.COLOR_NAMES.map(name => ({
+      name, hex: this.COLORS[name],
+      ring: s.bmTextColor === name ? this.ACCENT : '#2e2e32',
+      onClick: () => this.setState({ bmTextColor: name }),
+    }));
+    const bmValid = this.isValidOrder(s.bmName, s.bmEmail, s.bmPhone);
+
+    // ---- Figurine ----
+    const figSizeOptions = ['3', '5', '7'].map(sz => ({
+      label: sz + ' cm', price: this.FIG_PRICES[sz],
+      bg: s.figSize === sz ? this.ACCENT : '#0d0d0f',
+      color: s.figSize === sz ? '#161616' : '#c9c9cd',
+      border: s.figSize === sz ? this.ACCENT : '#2e2e32',
+      onClick: () => this.setState({ figSize: sz }),
+    }));
+    const figPrice = this.FIG_PRICES[s.figSize];
+    const figValid = this.isValidOrder(s.figName, s.figEmail, s.figPhone) && s.figWhat.trim();
+
+    // ---- Logo ----
+    const logoSizes = ['6 cm', '10 cm', '15 cm'];
+    const logoSizeOptions = logoSizes.map(sz => ({
+      label: sz,
+      bg: s.logoSize === sz ? this.ACCENT : '#0d0d0f',
+      color: s.logoSize === sz ? '#161616' : '#c9c9cd',
+      border: s.logoSize === sz ? this.ACCENT : '#2e2e32',
+      onClick: () => this.setState({ logoSize: sz }),
+    }));
+    const logoValid = this.isValidOrder(s.logoName, s.logoEmail, s.logoPhone) && s.logoBrand.trim();
+
+    // ---- Other ----
+    const otherValid = this.isValidOrder(s.otherName, s.otherEmail, s.otherPhone) && s.otherDesc.trim();
+
+    // ---- PS5 ----
+    const ps5Valid = this.isValidOrder(s.ps5Name, s.ps5Email, s.ps5Phone) && s.ps5Theme.trim();
+
+    const orders = s.orders.map(o => ({
+      ...o,
+      toggleBg: o.paid ? '#2f7a4f' : '#3a3a3f',
+      toggleLeft: o.paid ? '23px' : '3px',
+      onTogglePaid: () => this.togglePaid(o.id),
+      onDownload: () => this.download3MF(o),
+    }));
+
+    return {
+      catalogItems,
+      isCatalog: s.page === 'catalog',
+      isKeychain: s.page === 'keychain',
+      isKeycap: s.page === 'keycap',
+      isBookmark: s.page === 'bookmark',
+      isPs5: s.page === 'ps5',
+      isFigurine: s.page === 'figurine',
+      isLogo: s.page === 'logo',
+      isOther: s.page === 'other',
+      isStaff: s.page === 'staff',
+      goCatalog: () => goTo('catalog'),
+      goStaff: () => goTo('staff'),
+
+      // keychain
+      kcText: s.kcText, kcName: s.kcName, kcEmail: s.kcEmail, kcPhone: s.kcPhone,
+      kcPrice, kcPriceLabel: kcShowLogoField ? 'Base price' : 'Total', kcBaseSwatches, kcTextSwatches,
+      kcStyleOptions, kcShowLogoField, kcShow3D, kcStyleNote, kcLogo: s.kcLogo,
+      kcFontSize: s.kcFontSize, kcSecondText: s.kcSecondText, kcShowSpacing, kcWordSpacing: s.kcWordSpacing,
+      kcFontOptions, kcChainToggleBg, kcChainToggleLeft,
+      kcCanvasRef: this.kcCanvasRef, kcModelLoading, kcModelErrored, kcModelError: s.kcModelError,
+      kcShowConfirmation: !!(s.confirmation && s.page === 'keychain'),
+      kcShowForm: !(s.confirmation && s.page === 'keychain'),
+      kcSubmitDisabled: !kcValid,
+      kcSubmitBg: kcValid ? this.ACCENT : '#2a2a2e',
+      kcSubmitColor: kcValid ? '#161616' : '#6b6b72',
+      confirmation: s.confirmation,
+      onKcTextChange: (e) => { this.setState({ kcText: e.target.value }); this.scheduleGenerate(); },
+      onKcSecondTextChange: (e) => { this.setState({ kcSecondText: e.target.value }); this.scheduleGenerate(); },
+      onKcFontSizeChange: (e) => { this.setState({ kcFontSize: parseInt(e.target.value, 10) }); this.scheduleGenerate(); },
+      onKcWordSpacingChange: (e) => { this.setState({ kcWordSpacing: parseInt(e.target.value, 10) }); this.scheduleGenerate(); },
+      onKcChainLinkToggle: () => { this.setState((st) => ({ kcChainLink: !st.kcChainLink })); this.scheduleGenerate(true); },
+      onKcLogoChange: (e) => this.setState({ kcLogo: e.target.value }),
+      onKcNameChange: (e) => this.setState({ kcName: e.target.value }),
+      onKcEmailChange: (e) => this.setState({ kcEmail: e.target.value }),
+      onKcPhoneChange: (e) => this.setState({ kcPhone: e.target.value }),
+      submitKeychain: () => {
+        if (!kcValid) return;
+        this.submitOrder({
+          name: s.kcName, email: s.kcEmail, phone: s.kcPhone, type: 'Keychain',
+          specsText: `Line 1: "${s.kcText}"${kcHasSecond ? ' · Line 2: "' + s.kcSecondText + '"' : ''} · Style: ${s.kcStyle === 'text' ? 'Text only' : (s.kcStyle === 'logo_only' ? 'Logo only' : 'Name + Logo') + ' (' + s.kcLogo + ')'} · Font: ${s.kcFontFamily} ${s.kcFontSize}mm · Chain link: ${s.kcChainLink ? 'yes' : 'no'} · Base: ${s.kcBaseColor} · Text color: ${s.kcTextColor}`,
+          price: kcShowLogoField ? null : kcPrice, baseColorHex: this.COLORS[s.kcBaseColor], textColorHex: this.COLORS[s.kcTextColor],
+          dims: { w: kcApproxW, d: kcApproxD, h: this.KC_BASE_H, textDepth: this.KC_TEXT_H, hole: s.kcChainLink },
+        });
+      },
+
+      // keycap fidget toy
+      kfText: s.kfText, kfCountText, kfPrice, kfHousingSwatches, kfKeycapSwatches,
+      kfName: s.kfName, kfEmail: s.kfEmail, kfPhone: s.kfPhone,
+      kfShowConfirmation: !!(s.confirmation && s.page === 'keycap'),
+      kfShowForm: !(s.confirmation && s.page === 'keycap'),
+      kfSubmitDisabled: !kfValid,
+      kfSubmitBg: kfValid ? this.ACCENT : '#2a2a2e',
+      kfSubmitColor: kfValid ? '#161616' : '#6b6b72',
+      onKfTextChange: (e) => this.setState({ kfText: e.target.value }),
+      onKfNameChange: (e) => this.setState({ kfName: e.target.value }),
+      onKfEmailChange: (e) => this.setState({ kfEmail: e.target.value }),
+      onKfPhoneChange: (e) => this.setState({ kfPhone: e.target.value }),
+      submitKeycap: () => {
+        if (!kfValid) return;
+        this.submitOrder({
+          name: s.kfName, email: s.kfEmail, phone: s.kfPhone, type: 'Keycap Fidget Toy',
+          specsText: `Text: "${s.kfText}" · ${kfLetters} keycaps · Housing: ${s.kfHousingColor} · Keycaps: ${s.kfKeycapColor}`,
+          price: kfPrice, baseColorHex: this.COLORS[s.kfHousingColor], textColorHex: this.COLORS[s.kfKeycapColor],
+          dims: { w: 18 + kfLetters * 11, d: 30, h: 12, textDepth: 3, hole: false },
+        });
+      },
+
+      // bookmark
+      bmText: s.bmText, bmName: s.bmName, bmEmail: s.bmEmail, bmPhone: s.bmPhone,
+      bmPrice, bmBaseSwatches, bmTextSwatches,
+      bmShowConfirmation: !!(s.confirmation && s.page === 'bookmark'),
+      bmShowForm: !(s.confirmation && s.page === 'bookmark'),
+      bmSubmitDisabled: !bmValid,
+      bmSubmitBg: bmValid ? this.ACCENT : '#2a2a2e',
+      bmSubmitColor: bmValid ? '#161616' : '#6b6b72',
+      onBmTextChange: (e) => this.setState({ bmText: e.target.value }),
+      onBmNameChange: (e) => this.setState({ bmName: e.target.value }),
+      onBmEmailChange: (e) => this.setState({ bmEmail: e.target.value }),
+      onBmPhoneChange: (e) => this.setState({ bmPhone: e.target.value }),
+      submitBookmark: () => {
+        if (!bmValid) return;
+        this.submitOrder({
+          name: s.bmName, email: s.bmEmail, phone: s.bmPhone, type: 'Bookmark',
+          specsText: `Text: "${s.bmText}" · Base: ${s.bmBaseColor} · Text color: ${s.bmTextColor}`,
+          price: bmPrice, baseColorHex: this.COLORS[s.bmBaseColor], textColorHex: this.COLORS[s.bmTextColor],
+          dims: { w: bmDims.w, d: bmDims.d, h: this.BM_BASE_H, textDepth: 0.6, hole: bmDims.hole },
+        });
+      },
+
+      // ps5
+      ps5Theme: s.ps5Theme, ps5Name: s.ps5Name, ps5Email: s.ps5Email, ps5Phone: s.ps5Phone,
+      ps5ShowConfirmation: !!(s.confirmation && s.page === 'ps5'),
+      ps5ShowForm: !(s.confirmation && s.page === 'ps5'),
+      ps5SubmitDisabled: !ps5Valid,
+      ps5SubmitBg: ps5Valid ? this.ACCENT : '#2a2a2e',
+      ps5SubmitColor: ps5Valid ? '#161616' : '#6b6b72',
+      onPs5ThemeChange: (e) => this.setState({ ps5Theme: e.target.value }),
+      onPs5NameChange: (e) => this.setState({ ps5Name: e.target.value }),
+      onPs5EmailChange: (e) => this.setState({ ps5Email: e.target.value }),
+      onPs5PhoneChange: (e) => this.setState({ ps5Phone: e.target.value }),
+      submitPs5: () => {
+        if (!ps5Valid) return;
+        this.submitOrder({
+          name: s.ps5Name, email: s.ps5Email, phone: s.ps5Phone, type: 'PS5 Controller Holder',
+          specsText: `Design: ${s.ps5Theme}`,
+          price: null, baseColorHex: '#1B1B1B', textColorHex: '#F4F4F2',
+          dims: { w: 90, d: 60, h: 40, textDepth: 1, hole: false },
+        });
+      },
+
+      // figurine
+      figWhat: s.figWhat, figColorDesc: s.figColorDesc, figSizeOptions, figPrice,
+      figName: s.figName, figEmail: s.figEmail, figPhone: s.figPhone,
+      figShowConfirmation: !!(s.confirmation && s.page === 'figurine'),
+      figShowForm: !(s.confirmation && s.page === 'figurine'),
+      figSubmitDisabled: !figValid,
+      figSubmitBg: figValid ? this.ACCENT : '#2a2a2e',
+      figSubmitColor: figValid ? '#161616' : '#6b6b72',
+      onFigWhatChange: (e) => this.setState({ figWhat: e.target.value }),
+      onFigColorChange: (e) => this.setState({ figColorDesc: e.target.value }),
+      onFigNameChange: (e) => this.setState({ figName: e.target.value }),
+      onFigEmailChange: (e) => this.setState({ figEmail: e.target.value }),
+      onFigPhoneChange: (e) => this.setState({ figPhone: e.target.value }),
+      submitFigurine: () => {
+        if (!figValid) return;
+        this.submitOrder({
+          name: s.figName, email: s.figEmail, phone: s.figPhone, type: 'Figurine',
+          specsText: `${s.figWhat} · ${s.figSize} cm tall · Colors: ${s.figColorDesc || '(not specified)'}`,
+          price: figPrice, baseColorHex: '#1B1B1B', textColorHex: '#F4F4F2',
+          dims: { w: 60, d: 60, h: 90, textDepth: 1, hole: false },
+        });
+      },
+
+      // logo
+      logoBrand: s.logoBrand, logoColorDesc: s.logoColorDesc, logoSizeOptions,
+      logoName: s.logoName, logoEmail: s.logoEmail, logoPhone: s.logoPhone,
+      logoShowConfirmation: !!(s.confirmation && s.page === 'logo'),
+      logoShowForm: !(s.confirmation && s.page === 'logo'),
+      logoSubmitDisabled: !logoValid,
+      logoSubmitBg: logoValid ? this.ACCENT : '#2a2a2e',
+      logoSubmitColor: logoValid ? '#161616' : '#6b6b72',
+      onLogoBrandChange: (e) => this.setState({ logoBrand: e.target.value }),
+      onLogoColorChange: (e) => this.setState({ logoColorDesc: e.target.value }),
+      onLogoNameChange: (e) => this.setState({ logoName: e.target.value }),
+      onLogoEmailChange: (e) => this.setState({ logoEmail: e.target.value }),
+      onLogoPhoneChange: (e) => this.setState({ logoPhone: e.target.value }),
+      submitLogo: () => {
+        if (!logoValid) return;
+        this.submitOrder({
+          name: s.logoName, email: s.logoEmail, phone: s.logoPhone, type: 'Logo',
+          specsText: `Brand/logo: ${s.logoBrand} · Colors: ${s.logoColorDesc || '(brand default)'} · Length: ${s.logoSize}`,
+          price: null, baseColorHex: '#1B1B1B', textColorHex: '#F4F4F2',
+          dims: { w: 60, d: 40, h: 4, textDepth: 1, hole: true },
+        });
+      },
+
+      // other
+      otherDesc: s.otherDesc, otherName: s.otherName, otherEmail: s.otherEmail, otherPhone: s.otherPhone,
+      otherShowConfirmation: !!(s.confirmation && s.page === 'other'),
+      otherShowForm: !(s.confirmation && s.page === 'other'),
+      otherSubmitDisabled: !otherValid,
+      otherSubmitBg: otherValid ? this.ACCENT : '#2a2a2e',
+      otherSubmitColor: otherValid ? '#161616' : '#6b6b72',
+      onOtherDescChange: (e) => this.setState({ otherDesc: e.target.value }),
+      onOtherNameChange: (e) => this.setState({ otherName: e.target.value }),
+      onOtherEmailChange: (e) => this.setState({ otherEmail: e.target.value }),
+      onOtherPhoneChange: (e) => this.setState({ otherPhone: e.target.value }),
+      submitOther: () => {
+        if (!otherValid) return;
+        this.submitOrder({
+          name: s.otherName, email: s.otherEmail, phone: s.otherPhone, type: 'Custom request',
+          specsText: s.otherDesc,
+          price: null, baseColorHex: '#1B1B1B', textColorHex: '#F4F4F2',
+          dims: { w: 60, d: 60, h: 30, textDepth: 1, hole: false },
+        });
+      },
+
+      // staff
+      staffLocked: !s.staffAuthed,
+      staffUnlocked: s.staffAuthed,
+      staffPwInput: s.staffPwInput,
+      onStaffPwChange: (e) => this.setState({ staffPwInput: e.target.value }),
+      staffLogin: () => {
+        if (s.staffPwInput === 'staff123') this.setState({ staffAuthed: true });
+        else alert('Incorrect password.\n\nThis is a client-side demo gate only — replace with real server-side authentication before deploying.');
+      },
+      orders,
+      orderCount: s.orders.length,
+      hasOrders: s.orders.length > 0,
+      noOrders: s.orders.length === 0,
+    };
+  }
+}
+
+</script>
+</body>
+</html>
+
