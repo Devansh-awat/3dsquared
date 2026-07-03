@@ -16,18 +16,35 @@ static site plus a small Vercel serverless backend.
 
 ## Architecture
 
-- **Frontend**: `index.html` is a single-file app in Claude's "dc" component format — the whole
-  UI/state machine lives in one `<script type="text/x-dc" data-dc-script">` block as a class
-  (`Component extends DCLogic`) with a React-like `state` + `render()`. `support.js` is the
-  runtime that parses `<x-dc>`/`sc-if`/`sc-for`/`{{ }}` bindings in `index.html` and boots
-  React + ReactDOM + Babel from CDN on `DOMContentLoaded` — **no build step**, it's plain static
-  hosting. Don't edit `support.js` by hand (see its header comment — it's generated from a
-  separate `dc-runtime` source you don't have here).
-- **3D preview**: the keychain customizer compiles OpenSCAD (via `openscad-wasm` from a CDN) to
-  STL in-browser and renders it with `three.js`, live, as you type.
+- **Frontend — one real page per route, not a single-page app.** Each of `index.html` (catalog),
+  `keychain.html`, `bookmark.html`, `keycap.html`, `ps5.html`, `figurine.html`, `logo.html`,
+  `other.html`, `staff.html` is its own standalone document with its own `<x-dc>` template and its
+  own `Component extends DCLogic` class — navigation between them is plain `<a href>` full page
+  loads, so URLs are real/shareable/bookmarkable and back/forward work. This used to be one
+  monolithic `index.html` that swapped "pages" via JS state; it was split apart deliberately.
+  Adding a new product page means copying the pattern of an existing one (nav markup + own
+  Component class), not adding a branch to a shared switch.
+- Each page's format is Claude's "dc" component format — the whole UI/state machine for that page
+  lives in one `<script type="text/x-dc" data-dc-script">` block. `support.js` is the runtime that
+  parses `<x-dc>`/`sc-if`/`sc-for`/`{{ }}` bindings and boots React + ReactDOM + Babel from CDN on
+  `DOMContentLoaded` per page — **no build step**, it's plain static hosting. Don't edit
+  `support.js` by hand (see its header comment — it's generated from a separate `dc-runtime`
+  source you don't have here).
+- **`shared.js`** is a plain ES module (not a dc file) with the bits every page's Component class
+  needs from the backend: `submitOrder`, `checkSession`, `loadOrders`, `togglePaid`, `staffLogin`,
+  `staffLogout`, `download3MF`, plus `isValidOrder`/`COLORS`/`ACCENT` constants. Each page's class
+  pulls these in via `await import('./shared.js')` inside its methods (dynamic import works from
+  plain scripts, no bundler needed) — this keeps the network/session logic in one place instead of
+  duplicated nine times. Small synchronous-at-render-time constants (`ACCENT`, `COLORS`) are still
+  duplicated as class fields per page, since a dynamic import can't resolve before first render.
+- **3D preview**: the keychain page compiles OpenSCAD (via `openscad-wasm` from a CDN) to STL
+  in-browser and renders it with `three.js`, live, as you type. This logic only exists in
+  `keychain.html` — it's the one page that needs the `three` importmap and the `@font-face` rules
+  for `KC_FONTS`.
 - **3MF export**: `mf3-writer.js` builds a minimal, dependency-free `.3MF` (zip + 3MF XML) from an
   order's `dims`/color specs — simplified box geometry, not the precise engraved shape, just
-  enough for a slicer to open. Used by the staff panel's "Download .3MF" button.
+  enough for a slicer to open. Used by the staff panel's "Download .3MF" button, via
+  `shared.js`'s `download3MF`.
 - **Backend**: `/api/*.js` are Vercel Node serverless functions (zero-config — no framework).
   - `POST /api/staff-login` — checks the password against `STAFF_PASSWORD`, sets a signed,
     HttpOnly session cookie (HMAC'd with `SESSION_SECRET`, 8h expiry).
@@ -40,8 +57,9 @@ static site plus a small Vercel serverless backend.
 - **Database**: Postgres, schema in `scripts/schema.sql` (single `orders` table). `dims` and
   the rest of an order's specs are stored so `.3MF` files can be regenerated later from the
   staff panel.
-- **Fonts**: `KC_FONTS` in `index.html` is the single source of truth for keychain/bookmark
-  font choices — each entry needs a `.ttf` in `fonts/`, an `@font-face` in the `<style>` block,
+- **Fonts**: `KC_FONTS` in `keychain.html` is the single source of truth for keychain font
+  choices — each entry needs a `.ttf` in `fonts/`, an `@font-face` in `keychain.html`'s
+  `<style>` block,
   and the FreeType `family:style` name OpenSCAD needs (get it with
   `python3 -c "from fontTools.ttLib import TTFont; t=TTFont('fonts/X.ttf'); print(t['name'].getDebugName(1), t['name'].getDebugName(2))"`).
   Google Fonts often only ship variable `.ttf`s in their GitHub repo — fetch a static instance

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Action Figures / Mini Figures — 3D² Print Studio</title>
+<link rel="icon" type="image/svg+xml" href="./favicon.svg">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #0d0d0f; }
+    ::-webkit-scrollbar { width: 10px; height: 10px; }
+    ::-webkit-scrollbar-thumb { background: #2a2a2f; border-radius: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    input, textarea, select, button { font-family: inherit; }
+    input::placeholder, textarea::placeholder { color: #6b6b72; }
+  </style>
+</helmet>
+
+<div style="min-height: 100vh; background: #0d0d0f; color: #f2f2f0; font-family: -apple-system, 'Helvetica Neue', Helvetica, Arial, sans-serif;">
+
+  <!-- NAV -->
+  <div style="display:flex; align-items:center; justify-content:space-between; padding: 18px 32px; border-bottom: 1px solid #232326; position:sticky; top:0; background:rgba(13,13,15,0.92); backdrop-filter: blur(8px); z-index:50; height:36px;">
+    <a href="/index.html" style="display:flex; align-items:center; gap:10px; text-decoration:none; color:inherit;">
+      <div style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:22px; letter-spacing:-0.02em;">3D<span style="color: oklch(0.7 0.16 25);">²</span></div>
+      <div style="font-size:12px; color:#8a8a90; letter-spacing:0.08em; text-transform:uppercase; margin-top:2px;">print studio</div>
+    </a>
+    <div style="display:flex; align-items:center; gap:24px;">
+      <a href="/index.html" style="font-size:14px; color:#c9c9cd; text-decoration:none;">Catalog</a>
+      <a href="/staff.html" style="font-size:14px; color:#c9c9cd; text-decoration:none; border:1px solid #2e2e32; padding:8px 16px; border-radius:6px;">Staff Login</a>
+    </div>
+  </div>
+
+  <!-- FIGURINE -->
+  <div style="max-width:640px; margin:0 auto; padding:56px 32px 96px;">
+    <a href="/index.html" style="font-size:13px; color:#c9c9cd; text-decoration:none; display:block; margin-bottom:20px;">← Back to catalog</a>
+    <div style="font-family:'Space Grotesk',sans-serif; font-size:26px; font-weight:600; margin-bottom:6px;">Action Figures / Mini Figures</div>
+    <div style="font-size:13px; color:#8a8a90; margin-bottom:28px;">Describe what you'd like — our team confirms final price and details before printing.</div>
+
+    <sc-if value="{{ figShowConfirmation }}" hint-placeholder-val="{{ false }}">
+      <div style="background:#12241a; border:1px solid #2a5a3f; border-radius:10px; padding:24px;">
+        <div style="font-size:16px; font-weight:600; color:#7fe0a8; margin-bottom:8px;">Request received ✓</div>
+        <div style="font-size:13px; color:#b8ccc0; line-height:1.6;">Order ID: {{ confirmation.id }}<br/>We'll follow up by email/phone to confirm final price and details. Payment is not collected on this site.</div>
+        <a href="/index.html" style="margin-top:18px; background:transparent; border:1px solid #3a6a4f; color:#c9c9cd; padding:10px 18px; border-radius:6px; font-size:13px; cursor:pointer; text-decoration:none; display:inline-block;">Back to catalog</a>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ figShowForm }}" hint-placeholder-val="{{ true }}">
+      <div>
+        <div style="font-size:12px; color:#8a8a90; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;">Which figure?</div>
+        <input value="{{ figWhat }}" onChange="{{ onFigWhatChange }}" placeholder="e.g. Custom action figure of my dog" style="width:100%; background:#0d0d0f; border:1px solid #2e2e32; color:#f2f2f0; padding:12px 14px; border-radius:7px; font-size:14px; margin-bottom:8px;"/>
+        <div style="font-size:11px; color:#6b6b72; margin-bottom:24px;">A link to a photo or reference image is also great, if you have one.</div>
+
+        <div style="font-size:12px; color:#8a8a90; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;">Colors — per part</div>
+        <textarea value="{{ figColorDesc }}" onChange="{{ onFigColorChange }}" placeholder="e.g. body: red, base: black, eyes: white" rows="3" style="width:100%; background:#0d0d0f; border:1px solid #2e2e32; color:#f2f2f0; padding:12px 14px; border-radius:7px; font-size:14px; margin-bottom:24px; resize:vertical;"></textarea>
+
+        <div style="font-size:12px; color:#8a8a90; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;">Size (height)</div>
+        <div style="display:flex; gap:10px; margin-bottom:24px;">
+          <sc-for list="{{ figSizeOptions }}" as="opt" hint-placeholder-count="3">
+            <button style="flex:1; padding:12px 8px; border-radius:7px; font-size:13px; cursor:pointer; background: {{ opt.bg }}; border: 1px solid {{ opt.border }}; color: {{ opt.color }};" onClick="{{ opt.onClick }}">
+              <div style="font-weight:600;">{{ opt.label }}</div>
+              <div style="font-size:12px; opacity:0.8; margin-top:2px;">Above ₹{{ opt.price }}</div>
+            </button>
+          </sc-for>
+        </div>
+
+        <div style="font-size:12px; color:#8a8a90; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:10px;">Your details</div>
+        <input value="{{ figName }}" onChange="{{ onFigNameChange }}" placeholder="Full name" style="width:100%; background:#0d0d0f; border:1px solid #2e2e32; color:#f2f2f0; padding:11px 14px; border-radius:7px; font-size:14px; margin-bottom:10px;"/>
+        <input value="{{ figEmail }}" onChange="{{ onFigEmailChange }}" placeholder="Email" style="width:100%; background:#0d0d0f; border:1px solid #2e2e32; color:#f2f2f0; padding:11px 14px; border-radius:7px; font-size:14px; margin-bottom:10px;"/>
+        <input value="{{ figPhone }}" onChange="{{ onFigPhoneChange }}" placeholder="Phone number" style="width:100%; background:#0d0d0f; border:1px solid #2e2e32; color:#f2f2f0; padding:11px 14px; border-radius:7px; font-size:14px; margin-bottom:24px;"/>
+
+        <div style="display:flex; align-items:center; justify-content:space-between; padding:18px 20px; background:#151517; border:1px solid #232326; border-radius:9px; margin-bottom:8px;">
+          <div style="font-size:13px; color:#9a9aa0;">Starting price</div>
+          <div style="font-size:22px; font-weight:700; font-family:'Space Grotesk',sans-serif;">Above ₹{{ figPrice }}</div>
+        </div>
+        <div style="font-size:11px; color:#6b6b72; margin-bottom:16px;">Final price depends on chosen color.</div>
+        <button disabled="{{ figSubmitDisabled }}" style="width:100%; padding:14px; border-radius:8px; border:none; font-size:14px; font-weight:600; cursor:pointer; background: {{ figSubmitBg }}; color: {{ figSubmitColor }};" onClick="{{ submitFigurine }}">Submit order request</button>
+      </div>
+    </sc-if>
+  </div>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+
+class Component extends DCLogic {
+  state = {
+    confirmation: null,
+    figWhat: '', figColorDesc: '', figSize: '5',
+    figName: '', figEmail: '', figPhone: '',
+  };
+
+  ACCENT = 'oklch(0.7 0.16 25)';
+  FIG_PRICES = { '3': 250, '5': 350, '7': 400 };
+
+  isValidOrder(name, email, phone) {
+    return !!(name && name.trim() && /\S+@\S+\.\S+/.test(email || '') && phone && phone.trim().length >= 7);
+  }
+
+  async submitOrder(order) {
+    const { submitOrder } = await import('./shared.js');
+    const result = await submitOrder(order);
+    if (result.ok) this.setState({ confirmation: result.order });
+    else alert('Could not submit your order: ' + result.error);
+  }
+
+  renderVals() {
+    const s = this.state;
+    const figSizeOptions = ['3', '5', '7'].map(sz => ({
+      label: sz + ' cm', price: this.FIG_PRICES[sz],
+      bg: s.figSize === sz ? this.ACCENT : '#0d0d0f',
+      color: s.figSize === sz ? '#161616' : '#c9c9cd',
+      border: s.figSize === sz ? this.ACCENT : '#2e2e32',
+      onClick: () => this.setState({ figSize: sz }),
+    }));
+    const figPrice = this.FIG_PRICES[s.figSize];
+    const figValid = this.isValidOrder(s.figName, s.figEmail, s.figPhone) && s.figWhat.trim();
+
+    return {
+      figWhat: s.figWhat, figColorDesc: s.figColorDesc, figSizeOptions, figPrice,
+      figName: s.figName, figEmail: s.figEmail, figPhone: s.figPhone,
+      figShowConfirmation: !!s.confirmation,
+      figShowForm: !s.confirmation,
+      figSubmitDisabled: !figValid,
+      figSubmitBg: figValid ? this.ACCENT : '#2a2a2e',
+      figSubmitColor: figValid ? '#161616' : '#6b6b72',
+      confirmation: s.confirmation,
+      onFigWhatChange: (e) => this.setState({ figWhat: e.target.value }),
+      onFigColorChange: (e) => this.setState({ figColorDesc: e.target.value }),
+      onFigNameChange: (e) => this.setState({ figName: e.target.value }),
+      onFigEmailChange: (e) => this.setState({ figEmail: e.target.value }),
+      onFigPhoneChange: (e) => this.setState({ figPhone: e.target.value }),
+      submitFigurine: () => {
+        if (!figValid) return;
+        this.submitOrder({
+          name: s.figName, email: s.figEmail, phone: s.figPhone, type: 'Figurine',
+          specsText: `${s.figWhat} · ${s.figSize} cm tall · Colors: ${s.figColorDesc || '(not specified)'}`,
+          price: figPrice, baseColorHex: '#1B1B1B', textColorHex: '#F4F4F2',
+          dims: { w: 60, d: 60, h: 90, textDepth: 1, hole: false },
+        });
+      },
+    };
+  }
+}
+
+</script>
+</body>
+</html>

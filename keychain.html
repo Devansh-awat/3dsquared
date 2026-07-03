@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Custom Keychain — 3D² Print Studio</title>
+<link rel="icon" type="image/svg+xml" href="./favicon.svg">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <script type="importmap">
+  { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" } }
+  </script>
+  <style>
+    @font-face { font-family: 'Pacifico'; src: url('./fonts/Pacifico.ttf') format('truetype'); font-weight: 400; font-style: normal; }
+    @font-face { font-family: 'Bebas Neue'; src: url('./fonts/BebasNeue-Regular.ttf') format('truetype'); font-weight: 400; font-style: normal; }
+    @font-face { font-family: 'Permanent Marker'; src: url('./fonts/PermanentMarker-Regular.ttf') format('truetype'); font-weight: 400; font-style: normal; }
+    @font-face { font-family: 'Press Start 2P'; src: url('./fonts/PressStart2P-Regular.ttf') format('truetype'); font-weight: 400; font-style: normal; }
+    @font-face { font-family: 'Righteous'; src: url('./fonts/Righteous-Regular.ttf') format('truetype'); font-weight: 400; font-style: normal; }
+    @font-face { font-family: 'Roboto Mono Medium'; src: url('./fonts/RobotoMono-Medium.ttf') format('truetype'); font-weight: 500; font-style: normal; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #0d0d0f; }
+    ::-webkit-scrollbar { width: 10px; height: 10px; }
+    ::-webkit-scrollbar-thumb { background: #2a2a2f; border-radius: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    input, textarea, select, button { font-family: inherit; }
+    input::placeholder, textarea::placeholder { color: #6b6b72; }
+  </style>
+</helmet>
+
+<div style="min-height: 100vh; background: #0d0d0f; color: #f2f2f0; font-family: -apple-system, 'Helvetica Neue', Helvetica, Arial, sans-serif;">
+
+  <!-- NAV -->
+  <div style="display:flex; align-items:center; justify-content:space-between; padding: 18px 32px; border-bottom: 1px solid #232326; position:sticky; top:0; background:rgba(13,13,15,0.92); backdrop-filter: blur(8px); z-index:50; height:36px;">
+    <a href="/index.html" style="display:flex; align-items:center; gap:10px; text-decoration:none; color:inherit;">
+      <div style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:22px; letter-spacing:-0.02em;">3D<span style="color: oklch(0.7 0.16 25);">²</span></div>
+      <div style="font-size:12px; color:#8a8a90; letter-spacing:0.08em; text-transform:uppercase; margin-top:2px;">print studio</div>
+    </a>
+    <div style="display:flex; align-items:center; gap:24px;">
+      <a href="/index.html" style="font-size:14px; color:#c9c9cd; text-decoration:none;">Catalog</a>
+      <a href="/staff.html" style="font-size:14px; color:#c9c9cd; text-decoration:none; border:1px solid #2e2e32; padding:8px 16px; border-radius:6px;">Staff Login</a>
+    </div>
+  </div>
+
+  <!-- KEYCHAIN CUSTOMIZER -->
+  <div style="max-width:640px; margin:0 auto; padding:56px 32px 96px;">
+    <a href="/index.html" style="font-size:13px; color:#c9c9cd; text-decoration:none; display:block; margin-bottom:20px;">← Back to catalog</a>
+    <div style="font-family:'Space Grotesk',sans-serif; font-size:26px; font-weight:600; margin-bottom:6px;">Custom Keychain</div>
+    <div style="font-size:13px; color:#8a8a90; margin-bottom:28px;">Personalize the text, size and colors below.</div>
+
+    <sc-if value="{{ kcShowConfirmation }}" hint-placeholder-val="{{ false }}">
+      <div style="background:#12241a; border:1px solid #2a5a3f; border-radius:10px; padding:24px;">
+        <div style="font-size:16px; font-weight:600; color:#7fe0a8; margin-bottom:8px;">Order received ✓</div>
+        <div style="font-size:13px; color:#b8ccc0; line-height:1.6;">Order ID: {{ confirmation.id }}<br/>We'll follow up by email/phone to arrange payment and delivery. Payment is not collected on this site.</div>
+        <a href="/index.html" style="margin-top:18px; background:transparent; border:1px solid #3a6a4f; color:#c9c9cd; padding:10px 18px; border-radius:6px; font-size:13px; cursor:pointer; text-decoration:none; display:inline-block;">Back to catalog</a>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ kcShowForm }}" hint-placeholder-val="{{ true }}">
+      <div>
+        <div style="margin-bottom:24px;">
+          <sc-if value="{{ kcShow3D }}" hint-placeholder-val="{{ true }}">
+            <div style="position:relative; height:280px; background:#0a0a0c; border-radius:12px; overflow:hidden; cursor:grab;">
+              <canvas ref="{{ kcCanvasRef }}" style="width:100%; height:100%; display:block;"></canvas>
+              <sc-if value="{{ kcModelLoading }}" hint-placeholder-val="{{ true }}">
+                <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:12px; color:#8a8a90; background:rgba(10,10,12,0.55); pointer-events:none;">Rendering 3D model in your browser…</div>
+              </sc-if>
+              <sc-if value="{{ kcModelErrored }}" hint-placeholder-val="{{ false }}">
+                <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:12px; color:#e08a8a; text-align:center; padding:16px; background:rgba(10,10,12,0.85);">{{ kcModelError }}</div>
+              </sc-if>
+            </div>
+            <div style="font-size:11px; color:#5c5c62; text-align:center; margin-top:8px;">Live 3D preview, compiled in your browser from our parametric OpenSCAD design — drag to rotate.</div>
+          </sc-if>
+          <sc-if value="{{ kcShowLogoField }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:32px 20px; background:#101012; border:1px dashed #232326; border-radius:12px; text-align:center; font-size:12px; color:#6b6b72;">Logo pieces are modeled by hand — no automatic 3D preview for this style.</div>
+          </sc-if>
+        </div>
+
+        <div style="font-size:12px; color:#8a8a90; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;">Line 1</div>
+        <input value="{{ kcText }}" onChange="{{ onKcTextChange }}" maxlength="16" placeholder="Type the name or word to engrave" style="width:100%; background:#0d0d0f; border:1px solid #2e2e32; color:#f2f2f0; padding:12px 14px; border-radius:7px; font-size:15px; margin-bottom:20px;"/>
+
+        <div style="font-size:12px; color:#8a8a90; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;">Line 2 (optional)</div>
+        <input value="{{ kcSecondText }}" onChange="{{ onKcSecondTextChange }}" maxlength="16" placeholder="e.g. a date, or a second name" style="width:100%; background:#0d0d0f; border:1px solid #2e2e32; color:#f2f2f0; padding:11px 14px; border-radius:7px; font-size:14px; margin-bottom:20px;"/>
+
+        <sc-if value="{{ kcShowSpacing }}" hint-placeholder-val="{{ false }}">
+          <div style="font-size:12px; color:#8a8a90; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;">Line spacing</div>
+          <div style="display:flex; align-items:center; gap:12px; margin-bottom:20px;">
+            <input type="range" min="4" max="20" step="1" value="{{ kcWordSpacing }}" onChange="{{ onKcWordSpacingChange }}" style="flex:1; accent-color: oklch(0.7 0.16 25);"/>
+            <div style="font-size:13px; color:#c9c9cd; width:44px; text-align:right;">{{ kcWordSpacing }}mm</div>
+          </div>
+        </sc-if>
+
+        <div style="font-size:12px; color:#8a8a90; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;">Font size</div>
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:20px;">
+          <input type="range" min="12" max="28" step="1" value="{{ kcFontSize }}" onChange="{{ onKcFontSizeChange }}" style="flex:1; accent-color: oklch(0.7 0.16 25);"/>
+          <div style="font-size:13px; color:#c9c9cd; width:44px; text-align:right;">{{ kcFontSize }}mm</div>
+        </div>
+
+        <div style="font-size:12px; color:#8a8a90; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;">Font</div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:24px;">
+          <sc-for list="{{ kcFontOptions }}" as="opt" hint-placeholder-count="1">
+            <button style="padding:10px 16px; border-radius:7px; font-size:14px; cursor:pointer; background: {{ opt.bg }}; border: 1px solid {{ opt.border }}; color: {{ opt.color }}; font-family: {{ opt.previewFont }};" onClick="{{ opt.onClick }}">{{ opt.label }}</button>
+          </sc-for>
+        </div>
+
+        <div style="font-size:12px; color:#8a8a90; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;">Style</div>
+        <div style="display:flex; gap:10px; margin-bottom:12px;">
+          <sc-for list="{{ kcStyleOptions }}" as="opt" hint-placeholder-count="3">
+            <button style="flex:1; padding:12px 8px; border-radius:7px; font-size:13px; cursor:pointer; background: {{ opt.bg }}; border: 1px solid {{ opt.border }}; color: {{ opt.color }};" onClick="{{ opt.onClick }}">{{ opt.label }}</button>
+          </sc-for>
+        </div>
+
+        <sc-if value="{{ kcShowLogoField }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-bottom:12px;">
+            <input value="{{ kcLogo }}" onChange="{{ onKcLogoChange }}" placeholder="Which logo? e.g. CSK, Apple, Brawl Stars" style="width:100%; background:#0d0d0f; border:1px solid #2e2e32; color:#f2f2f0; padding:12px 14px; border-radius:7px; font-size:14px;"/>
+          </div>
+        </sc-if>
+        <div style="font-size:11px; color:#6b6b72; margin-bottom:24px;">{{ kcStyleNote }}</div>
+
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:24px;">
+          <div style="font-size:13px; color:#c9c9cd;">Chain link loop</div>
+          <div onClick="{{ onKcChainLinkToggle }}" style="width:44px; height:24px; border-radius:12px; cursor:pointer; background: {{ kcChainToggleBg }}; position:relative;">
+            <div style="width:18px; height:18px; border-radius:50%; background:#fff; position:absolute; top:3px; left: {{ kcChainToggleLeft }}; transition: left 0.15s;"></div>
+          </div>
+        </div>
+
+        <div style="font-size:12px; color:#8a8a90; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;">Base color</div>
+        <div style="display:flex; gap:14px; margin-bottom:24px;">
+          <sc-for list="{{ kcBaseSwatches }}" as="sw" hint-placeholder-count="4">
+            <div onClick="{{ sw.onClick }}" title="{{ sw.name }}" style="width:36px; height:36px; border-radius:50%; background:{{ sw.hex }}; cursor:pointer; border: 3px solid {{ sw.ring }}; box-shadow: 0 0 0 1px #000 inset;"></div>
+          </sc-for>
+        </div>
+
+        <div style="font-size:12px; color:#8a8a90; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;">Text color</div>
+        <div style="display:flex; gap:14px; margin-bottom:28px;">
+          <sc-for list="{{ kcTextSwatches }}" as="sw" hint-placeholder-count="4">
+            <div onClick="{{ sw.onClick }}" title="{{ sw.name }}" style="width:36px; height:36px; border-radius:50%; background:{{ sw.hex }}; cursor:pointer; border: 3px solid {{ sw.ring }}; box-shadow: 0 0 0 1px #000 inset;"></div>
+          </sc-for>
+        </div>
+
+        <div style="height:1px; background:#232326; margin: 8px 0 24px;"></div>
+
+        <div style="font-size:12px; color:#8a8a90; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:10px;">Your details</div>
+        <input value="{{ kcName }}" onChange="{{ onKcNameChange }}" placeholder="Full name" style="width:100%; background:#0d0d0f; border:1px solid #2e2e32; color:#f2f2f0; padding:11px 14px; border-radius:7px; font-size:14px; margin-bottom:10px;"/>
+        <input value="{{ kcEmail }}" onChange="{{ onKcEmailChange }}" placeholder="Email" style="width:100%; background:#0d0d0f; border:1px solid #2e2e32; color:#f2f2f0; padding:11px 14px; border-radius:7px; font-size:14px; margin-bottom:10px;"/>
+        <input value="{{ kcPhone }}" onChange="{{ onKcPhoneChange }}" placeholder="Phone number" style="width:100%; background:#0d0d0f; border:1px solid #2e2e32; color:#f2f2f0; padding:11px 14px; border-radius:7px; font-size:14px; margin-bottom:24px;"/>
+
+        <div style="display:flex; align-items:center; justify-content:space-between; padding:18px 20px; background:#0d0d0f; border:1px solid #232326; border-radius:9px; margin-bottom:8px;">
+          <div style="font-size:13px; color:#9a9aa0;">{{ kcPriceLabel }}</div>
+          <div style="font-size:22px; font-weight:700; font-family:'Space Grotesk',sans-serif;">₹{{ kcPrice }}</div>
+        </div>
+        <sc-if value="{{ kcShowLogoField }}" hint-placeholder-val="{{ false }}">
+          <div style="font-size:11px; color:#6b6b72; margin-bottom:16px;">Plus a logo design fee, quoted after we review your logo.</div>
+        </sc-if>
+
+        <button disabled="{{ kcSubmitDisabled }}" style="width:100%; padding:14px; border-radius:8px; border:none; font-size:14px; font-weight:600; cursor:pointer; background: {{ kcSubmitBg }}; color: {{ kcSubmitColor }};" onClick="{{ submitKeychain }}">Checkout — pay on delivery/pickup</button>
+      </div>
+    </sc-if>
+  </div>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+
+class Component extends DCLogic {
+  state = {
+    confirmation: null,
+    kcText: '', kcSecondText: '', kcFontSize: 18, kcWordSpacing: 9, kcFontFamily: 'Pacifico', kcChainLink: true,
+    kcBaseColor: 'Black', kcTextColor: 'White', kcStyle: 'text', kcLogo: '',
+    kcModelState: 'idle', kcModelError: null,
+    kcName: '', kcEmail: '', kcPhone: '',
+  };
+
+  COLORS = { Red: '#D64545', Blue: '#3B6FD6', Black: '#1B1B1B', White: '#F4F4F2' };
+  COLOR_NAMES = ['Red', 'Blue', 'Black', 'White'];
+  ACCENT = 'oklch(0.7 0.16 25)';
+
+  // Fixed per your instruction — not user-tweakable.
+  KC_BASE_H = 2.5;
+  KC_CONTOUR_H = 1.2;
+  KC_TEXT_H = 1.5;
+  KC_BASE_PAD = 4;
+  KC_CONTOUR_PAD = 2;
+
+  // Registry of fonts available for the keychain preview. Add more entries here
+  // (and upload the matching .ttf into fonts/) to offer more choices.
+  KC_FONTS = {
+    Pacifico: { file: './fonts/Pacifico.ttf', scadName: 'Pacifico:style=Regular', previewCss: "'Pacifico', cursive" },
+    'Bebas Neue': { file: './fonts/BebasNeue-Regular.ttf', scadName: 'Bebas Neue:style=Regular', previewCss: "'Bebas Neue', sans-serif" },
+    'Permanent Marker': { file: './fonts/PermanentMarker-Regular.ttf', scadName: 'Permanent Marker:style=Regular', previewCss: "'Permanent Marker', cursive" },
+    'Press Start 2P': { file: './fonts/PressStart2P-Regular.ttf', scadName: 'Press Start 2P:style=Regular', previewCss: "'Press Start 2P', monospace" },
+    Righteous: { file: './fonts/Righteous-Regular.ttf', scadName: 'Righteous:style=Regular', previewCss: "'Righteous', sans-serif" },
+    'Roboto Mono': { file: './fonts/RobotoMono-Medium.ttf', scadName: 'Roboto Mono Medium:style=Regular', previewCss: "'Roboto Mono Medium', monospace" },
+  };
+
+  kcCanvasRef = (node) => {
+    this._canvasNode = node;
+    if (node) this.initThree(node);
+    else this.disposeThree();
+  };
+
+  scadEscape(str) {
+    return String(str).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+  }
+
+  // Each layer (base / contour / text / chain link) is compiled as its OWN
+  // independent OpenSCAD program and combined only in three.js — never unioned
+  // inside OpenSCAD, since a second offset()+extrude() unioned in the same compile
+  // is extremely expensive on the CGAL backend with a cursive font (~20s vs ~100ms
+  // for a single offset). Stacking the independent solids visually reproduces the
+  // original design's layered look without needing any CSG boolean.
+  buildKcDrawTextModule(p) {
+    const font = this.KC_FONTS[p.fontKey] || this.KC_FONTS.Pacifico;
+    const t1 = this.scadEscape(p.text);
+    const hasSecond = !!(p.secondText && p.secondText.trim());
+    if (hasSecond) {
+      const t2 = this.scadEscape(p.secondText.trim());
+      return `
+module draw_text() {
+  translate([0, ${p.wordSpacing}]) text("${t1}", size=${p.fontSize}, font="${font.scadName}", valign="center");
+  translate([0, ${-p.wordSpacing}]) text("${t2}", size=${p.fontSize}, font="${font.scadName}", valign="center");
+}
+`;
+    }
+    return `
+module draw_text() {
+  text("${t1}", size=${p.fontSize}, font="${font.scadName}", valign="center");
+}
+`;
+  }
+
+  buildKcScadCommon(p) {
+    const font = this.KC_FONTS[p.fontKey] || this.KC_FONTS.Pacifico;
+    return `use <${font.file.replace('./', '')}>\n$fn = 20;\n` + this.buildKcDrawTextModule(p);
+  }
+
+  buildKcBaseScad(p) {
+    return this.buildKcScadCommon(p) + `
+linear_extrude(height=${this.KC_BASE_H}) offset(r=${this.KC_BASE_PAD}) draw_text();
+`;
+  }
+
+  buildKcContourScad(p) {
+    return this.buildKcScadCommon(p) + `
+linear_extrude(height=${this.KC_BASE_H + this.KC_CONTOUR_H}) offset(r=${this.KC_CONTOUR_PAD}) draw_text();
+`;
+  }
+
+  buildKcTextScad(p) {
+    return this.buildKcScadCommon(p) + `
+translate([0, 0, ${this.KC_BASE_H + this.KC_CONTOUR_H}]) linear_extrude(height=${this.KC_TEXT_H}) draw_text();
+`;
+  }
+
+  buildKcChainScad() {
+    const bore = this.KC_BASE_PAD * 1.5, chainLen = bore * 2, h = this.KC_BASE_H;
+    return `
+$fn = 24;
+bore_size = ${bore}; chain_link_length = ${chainLen}; base_height = ${h};
+translate([2 * bore_size - chain_link_length, 0, 0]) difference() {
+  hull() {
+    translate([-bore_size, 0, 0]) cylinder(h=base_height, r=bore_size, center=false);
+    translate([-bore_size, -bore_size, 0]) cube([chain_link_length, bore_size * 2, base_height], false);
+  }
+  translate([-bore_size, 0, 0]) cylinder(h=base_height * 2, r=bore_size / 2, center=true);
+}
+`;
+  }
+
+  getOpenSCADModule() {
+    if (!this._oscadModPromise) {
+      this._oscadModPromise = import('https://cdn.jsdelivr.net/npm/openscad-wasm@0.0.4/openscad.js');
+    }
+    return this._oscadModPromise;
+  }
+
+  getFontBytes(fontKey) {
+    if (!this._fontBufCache) this._fontBufCache = {};
+    if (!this._fontBufCache[fontKey]) {
+      const font = this.KC_FONTS[fontKey] || this.KC_FONTS.Pacifico;
+      this._fontBufCache[fontKey] = fetch(font.file)
+        .then((r) => r.arrayBuffer())
+        .then((buf) => new Uint8Array(buf));
+    }
+    return this._fontBufCache[fontKey];
+  }
+
+  // OpenSCAD's WASM main() exits its runtime after one callMain — a second call on
+  // the same instance aborts. So each compile gets its own fresh instance (~1s to
+  // spin up, but keeps every render reliable).
+  async renderScad(code, fontKey) {
+    const font = this.KC_FONTS[fontKey] || this.KC_FONTS.Pacifico;
+    const mod = await this.getOpenSCADModule();
+    const inst = await mod.createOpenSCAD({ noInitialRun: true });
+    const fontBuf = await this.getFontBytes(fontKey);
+    const FS = inst.getInstance().FS;
+    try { FS.mkdir('/fonts'); } catch (e) {}
+    FS.writeFile(font.file.replace('./', '/'), fontBuf);
+    return inst.renderToStl(code);
+  }
+
+  ensureThree() {
+    if (!this._threeModPromise) {
+      this._threeModPromise = (async () => {
+        const THREE = await import('three');
+        const { STLLoader } = await import('https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/STLLoader.js');
+        return { THREE, STLLoader };
+      })();
+    }
+    return this._threeModPromise;
+  }
+
+  async initThree(canvas) {
+    const { THREE, STLLoader } = await this.ensureThree();
+    if (this._canvasNode !== canvas) return;
+    this._THREE = THREE;
+    this._STLLoader = STLLoader;
+    const w = canvas.clientWidth || 400, h = canvas.clientHeight || 280;
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, preserveDrawingBuffer: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setSize(w, h, false);
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x0a0a0c);
+    const camera = new THREE.PerspectiveCamera(40, w / h, 0.1, 1000);
+    const group = new THREE.Group();
+    group.rotation.x = -0.85;
+    scene.add(group);
+    scene.add(new THREE.AmbientLight(0xffffff, 0.7));
+    const dl = new THREE.DirectionalLight(0xffffff, 0.9); dl.position.set(6, -8, 10); scene.add(dl);
+    const dl2 = new THREE.DirectionalLight(0xffffff, 0.3); dl2.position.set(-6, 8, -4); scene.add(dl2);
+
+    this._renderer = renderer; this._scene = scene; this._camera = camera; this._group = group;
+
+    let dragging = false, lastX = 0, lastY = 0;
+    const onDown = (e) => { dragging = true; lastX = e.clientX; lastY = e.clientY; canvas.style.cursor = 'grabbing'; };
+    const onMove = (e) => {
+      if (!dragging) return;
+      const dx = e.clientX - lastX, dy = e.clientY - lastY;
+      lastX = e.clientX; lastY = e.clientY;
+      group.rotation.z += dx * 0.008;
+      group.rotation.x = Math.max(-1.4, Math.min(0.3, group.rotation.x + dy * 0.008));
+    };
+    const onUp = () => { dragging = false; canvas.style.cursor = 'grab'; };
+    canvas.addEventListener('pointerdown', onDown);
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup', onUp);
+    this._cleanupDrag = () => {
+      canvas.removeEventListener('pointerdown', onDown);
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onUp);
+    };
+
+    const loop = () => {
+      this._rafId = requestAnimationFrame(loop);
+      renderer.render(scene, camera);
+    };
+    loop();
+
+    this.scheduleGenerate(true);
+  }
+
+  disposeThree() {
+    if (this._rafId) cancelAnimationFrame(this._rafId);
+    if (this._cleanupDrag) this._cleanupDrag();
+    if (this._renderer) this._renderer.dispose();
+    this._renderer = null; this._scene = null; this._camera = null; this._group = null;
+    this._meshA = null; this._meshB = null;
+  }
+
+  scheduleGenerate(immediate) {
+    if (this._genTimer) clearTimeout(this._genTimer);
+    this._genTimer = setTimeout(() => this.generateModel(), immediate ? 0 : 500);
+  }
+
+  recolorMeshes(baseName, textName) {
+    if (!this._meshes) return;
+    const b = baseName || this.state.kcBaseColor, t = textName || this.state.kcTextColor;
+    this._meshes.forEach((m) => {
+      m.material.color.set(this.COLORS[m.userData.key === 'text' ? t : b]);
+    });
+  }
+
+  applyMeshes(layers) {
+    const THREE = this._THREE;
+    if (this._meshes) {
+      this._meshes.forEach((m) => { this._group.remove(m); m.geometry.dispose(); });
+    }
+    this._meshes = [];
+    let refGeo = null;
+    layers.forEach((layer) => {
+      const loader = new this._STLLoader();
+      const geo = loader.parse(new TextEncoder().encode(layer.stl).buffer);
+      geo.computeVertexNormals();
+      const mat = new THREE.MeshStandardMaterial({ color: layer.colorHex, roughness: layer.key === 'text' ? 0.4 : 0.55, metalness: 0.05, side: THREE.DoubleSide });
+      const mesh = new THREE.Mesh(geo, mat);
+      mesh.userData.key = layer.key;
+      this._group.add(mesh);
+      this._meshes.push(mesh);
+      if (layer.key === 'base') refGeo = geo;
+    });
+    if (!refGeo) refGeo = this._meshes[0].geometry;
+
+    refGeo.computeBoundingBox();
+    const center = new THREE.Vector3();
+    refGeo.boundingBox.getCenter(center);
+    this._meshes.forEach((m) => m.position.set(-center.x, -center.y, -center.z));
+
+    const size = new THREE.Vector3();
+    refGeo.boundingBox.getSize(size);
+    const maxDim = Math.max(size.x, size.y, size.z, 1);
+    this._camera.position.set(0, -maxDim * 1.1, maxDim * 1.9);
+    this._camera.near = maxDim * 0.01; this._camera.far = maxDim * 20;
+    this._camera.up.set(0, 0, 1);
+    this._camera.lookAt(0, 0, 0);
+    this._camera.updateProjectionMatrix();
+  }
+
+  async generateModel() {
+    if (!this._scene) return;
+    if (this.state.kcStyle !== 'text') { this.setState({ kcModelState: 'idle' }); return; }
+    const token = (this._genToken = (this._genToken || 0) + 1);
+    const s = this.state;
+    const params = {
+      text: (s.kcText || '').trim() || 'Name',
+      secondText: s.kcSecondText,
+      fontSize: s.kcFontSize,
+      wordSpacing: s.kcWordSpacing,
+      fontKey: s.kcFontFamily,
+    };
+    this.setState({ kcModelState: 'loading', kcModelError: null });
+    await new Promise((r) => setTimeout(r, 0)); // let the loading overlay paint before the blocking compile
+    if (token !== this._genToken || !this._scene) return;
+    try {
+      const jobs = [
+        { key: 'base', code: this.buildKcBaseScad(params), colorHex: this.COLORS[s.kcBaseColor] },
+        { key: 'contour', code: this.buildKcContourScad(params), colorHex: this.COLORS[s.kcBaseColor] },
+        { key: 'text', code: this.buildKcTextScad(params), colorHex: this.COLORS[s.kcTextColor] },
+      ];
+      if (s.kcChainLink) jobs.push({ key: 'chain', code: this.buildKcChainScad(), colorHex: this.COLORS[s.kcBaseColor] });
+
+      const layers = [];
+      for (const job of jobs) {
+        const stl = await this.renderScad(job.code, params.fontKey);
+        if (token !== this._genToken || !this._scene) return;
+        layers.push({ stl, colorHex: job.colorHex, key: job.key });
+      }
+      this.applyMeshes(layers);
+      this.setState({ kcModelState: 'ready' });
+    } catch (e) {
+      if (token !== this._genToken) return;
+      this.setState({ kcModelState: 'error', kcModelError: 'Preview unavailable — ' + (e && e.message ? e.message : 'render failed') });
+    }
+  }
+
+  isValidOrder(name, email, phone) {
+    return !!(name && name.trim() && /\S+@\S+\.\S+/.test(email || '') && phone && phone.trim().length >= 7);
+  }
+
+  async submitOrder(order) {
+    const { submitOrder } = await import('./shared.js');
+    const result = await submitOrder(order);
+    if (result.ok) this.setState({ confirmation: result.order });
+    else alert('Could not submit your order: ' + result.error);
+  }
+
+  renderVals() {
+    const s = this.state;
+
+    const kcHasSecond = !!(s.kcSecondText && s.kcSecondText.trim());
+    const kcShowSpacing = kcHasSecond;
+    const kcPrice = 180 + (kcHasSecond ? 40 : 0);
+    const kcChainToggleBg = s.kcChainLink ? this.ACCENT : '#3a3a3f';
+    const kcChainToggleLeft = s.kcChainLink ? '23px' : '3px';
+    const kcApproxLen = Math.max((s.kcText || '').trim().length, 3);
+    const kcApproxW = Math.round(kcApproxLen * s.kcFontSize * 0.65 + this.KC_BASE_PAD * 2);
+    const kcApproxD = Math.round(s.kcFontSize * (kcHasSecond ? 2.4 : 1.4) + this.KC_BASE_PAD * 2);
+    const kcFontOptions = Object.keys(this.KC_FONTS).map(key => ({
+      label: key,
+      previewFont: this.KC_FONTS[key].previewCss,
+      bg: s.kcFontFamily === key ? this.ACCENT : '#0d0d0f',
+      color: s.kcFontFamily === key ? '#161616' : '#c9c9cd',
+      border: s.kcFontFamily === key ? this.ACCENT : '#2e2e32',
+      onClick: () => { this.setState({ kcFontFamily: key }); this.scheduleGenerate(true); },
+    }));
+    const kcBaseSwatches = this.COLOR_NAMES.map(name => ({
+      name, hex: this.COLORS[name],
+      ring: s.kcBaseColor === name ? this.ACCENT : '#2e2e32',
+      onClick: () => { this.setState({ kcBaseColor: name }); this.recolorMeshes(name, undefined); },
+    }));
+    const kcTextSwatches = this.COLOR_NAMES.map(name => ({
+      name, hex: this.COLORS[name],
+      ring: s.kcTextColor === name ? this.ACCENT : '#2e2e32',
+      onClick: () => { this.setState({ kcTextColor: name }); this.recolorMeshes(undefined, name); },
+    }));
+    const kcStyleOptions = [
+      { key: 'text', label: 'Text only' },
+      { key: 'name_logo', label: 'Name + Logo' },
+      { key: 'logo_only', label: 'Logo only' },
+    ].map(o => ({
+      label: o.label,
+      bg: s.kcStyle === o.key ? this.ACCENT : '#0d0d0f',
+      color: s.kcStyle === o.key ? '#161616' : '#c9c9cd',
+      border: s.kcStyle === o.key ? this.ACCENT : '#2e2e32',
+      onClick: () => { this.setState({ kcStyle: o.key }); this.scheduleGenerate(true); },
+    }));
+    const kcShowLogoField = s.kcStyle !== 'text';
+    const kcShow3D = s.kcStyle === 'text';
+    const kcStyleNote = kcShowLogoField
+      ? 'Logo pieces are modeled individually by hand (not generated from the parametric text file). The logo design fee depends on the logo itself and is confirmed after we review it.'
+      : 'Generated directly from our parametric keychain design.';
+    const kcModelLoading = s.kcModelState === 'loading';
+    const kcModelErrored = s.kcModelState === 'error';
+    const kcValid = this.isValidOrder(s.kcName, s.kcEmail, s.kcPhone) && (!kcShowLogoField || s.kcLogo.trim());
+
+    return {
+      kcText: s.kcText, kcName: s.kcName, kcEmail: s.kcEmail, kcPhone: s.kcPhone,
+      kcPrice, kcPriceLabel: kcShowLogoField ? 'Base price' : 'Total', kcBaseSwatches, kcTextSwatches,
+      kcStyleOptions, kcShowLogoField, kcShow3D, kcStyleNote, kcLogo: s.kcLogo,
+      kcFontSize: s.kcFontSize, kcSecondText: s.kcSecondText, kcShowSpacing, kcWordSpacing: s.kcWordSpacing,
+      kcFontOptions, kcChainToggleBg, kcChainToggleLeft,
+      kcCanvasRef: this.kcCanvasRef, kcModelLoading, kcModelErrored, kcModelError: s.kcModelError,
+      kcShowConfirmation: !!s.confirmation,
+      kcShowForm: !s.confirmation,
+      kcSubmitDisabled: !kcValid,
+      kcSubmitBg: kcValid ? this.ACCENT : '#2a2a2e',
+      kcSubmitColor: kcValid ? '#161616' : '#6b6b72',
+      confirmation: s.confirmation,
+      onKcTextChange: (e) => { this.setState({ kcText: e.target.value }); this.scheduleGenerate(); },
+      onKcSecondTextChange: (e) => { this.setState({ kcSecondText: e.target.value }); this.scheduleGenerate(); },
+      onKcFontSizeChange: (e) => { this.setState({ kcFontSize: parseInt(e.target.value, 10) }); this.scheduleGenerate(); },
+      onKcWordSpacingChange: (e) => { this.setState({ kcWordSpacing: parseInt(e.target.value, 10) }); this.scheduleGenerate(); },
+      onKcChainLinkToggle: () => { this.setState((st) => ({ kcChainLink: !st.kcChainLink })); this.scheduleGenerate(true); },
+      onKcLogoChange: (e) => this.setState({ kcLogo: e.target.value }),
+      onKcNameChange: (e) => this.setState({ kcName: e.target.value }),
+      onKcEmailChange: (e) => this.setState({ kcEmail: e.target.value }),
+      onKcPhoneChange: (e) => this.setState({ kcPhone: e.target.value }),
+      submitKeychain: () => {
+        if (!kcValid) return;
+        this.submitOrder({
+          name: s.kcName, email: s.kcEmail, phone: s.kcPhone, type: 'Keychain',
+          specsText: `Line 1: "${s.kcText}"${kcHasSecond ? ' · Line 2: "' + s.kcSecondText + '"' : ''} · Style: ${s.kcStyle === 'text' ? 'Text only' : (s.kcStyle === 'logo_only' ? 'Logo only' : 'Name + Logo') + ' (' + s.kcLogo + ')'} · Font: ${s.kcFontFamily} ${s.kcFontSize}mm · Chain link: ${s.kcChainLink ? 'yes' : 'no'} · Base: ${s.kcBaseColor} · Text color: ${s.kcTextColor}`,
+          price: kcShowLogoField ? null : kcPrice, baseColorHex: this.COLORS[s.kcBaseColor], textColorHex: this.COLORS[s.kcTextColor],
+          dims: { w: kcApproxW, d: kcApproxD, h: this.KC_BASE_H, textDepth: this.KC_TEXT_H, hole: s.kcChainLink },
+        });
+      },
+    };
+  }
+}
+
+</script>
+</body>
+</html>

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Staff Panel — 3D² Print Studio</title>
+<link rel="icon" type="image/svg+xml" href="./favicon.svg">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #0d0d0f; }
+    ::-webkit-scrollbar { width: 10px; height: 10px; }
+    ::-webkit-scrollbar-thumb { background: #2a2a2f; border-radius: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    input, textarea, select, button { font-family: inherit; }
+    input::placeholder, textarea::placeholder { color: #6b6b72; }
+  </style>
+</helmet>
+
+<div style="min-height: 100vh; background: #0d0d0f; color: #f2f2f0; font-family: -apple-system, 'Helvetica Neue', Helvetica, Arial, sans-serif;">
+
+  <!-- NAV -->
+  <div style="display:flex; align-items:center; justify-content:space-between; padding: 18px 32px; border-bottom: 1px solid #232326; position:sticky; top:0; background:rgba(13,13,15,0.92); backdrop-filter: blur(8px); z-index:50; height:36px;">
+    <a href="/index.html" style="display:flex; align-items:center; gap:10px; text-decoration:none; color:inherit;">
+      <div style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:22px; letter-spacing:-0.02em;">3D<span style="color: oklch(0.7 0.16 25);">²</span></div>
+      <div style="font-size:12px; color:#8a8a90; letter-spacing:0.08em; text-transform:uppercase; margin-top:2px;">print studio</div>
+    </a>
+    <div style="display:flex; align-items:center; gap:24px;">
+      <a href="/index.html" style="font-size:14px; color:#c9c9cd; text-decoration:none;">Catalog</a>
+      <a href="/staff.html" style="font-size:14px; color:#c9c9cd; text-decoration:none; border:1px solid #2e2e32; padding:8px 16px; border-radius:6px;">Staff Login</a>
+    </div>
+  </div>
+
+  <!-- STAFF PANEL -->
+  <div style="max-width:1320px; margin:0 auto; padding:56px 32px 96px;">
+    <sc-if value="{{ staffLocked }}" hint-placeholder-val="{{ true }}">
+      <div style="max-width:380px; margin: 60px auto 0; background:#151517; border:1px solid #232326; border-radius:10px; padding:32px;">
+        <div style="font-size:18px; font-weight:600; margin-bottom:6px;">Staff login</div>
+        <div style="font-size:12px; color:#8a8a90; margin-bottom:20px; line-height:1.5;">Enter the staff password to view and manage orders.</div>
+        <input type="password" value="{{ staffPwInput }}" onChange="{{ onStaffPwChange }}" placeholder="Password" style="width:100%; background:#0d0d0f; border:1px solid #2e2e32; color:#f2f2f0; padding:11px 14px; border-radius:7px; font-size:14px; margin-bottom:14px;"/>
+        <button style="width:100%; padding:12px; border-radius:7px; border:none; background: oklch(0.7 0.16 25); color:#161616; font-weight:600; font-size:14px; cursor:pointer;" onClick="{{ staffLogin }}">Enter</button>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ staffUnlocked }}" hint-placeholder-val="{{ false }}">
+      <div>
+        <div style="display:flex; align-items:baseline; justify-content:space-between; margin-bottom:24px;">
+          <div>
+            <div style="font-family:'Space Grotesk',sans-serif; font-size:26px; font-weight:600;">Orders</div>
+            <div style="font-size:12px; color:#8a8a90; margin-top:4px;">Synced from the orders database — visible to any staff member who logs in.</div>
+          </div>
+          <div style="display:flex; align-items:center; gap:16px;">
+            <div style="font-size:13px; color:#c9c9cd;">{{ orderCount }} orders</div>
+            <div style="font-size:13px; color:#c9c9cd; cursor:pointer; border:1px solid #2e2e32; padding:8px 16px; border-radius:6px;" onClick="{{ staffLogout }}">Log out</div>
+          </div>
+        </div>
+
+        <sc-if value="{{ hasOrders }}" hint-placeholder-val="{{ false }}">
+          <div style="border:1px solid #232326; border-radius:10px; overflow:hidden;">
+            <div style="display:grid; grid-template-columns: 1.2fr 1fr 2fr 1fr 1.4fr; background:#1a1a1d; padding:14px 20px; font-size:11px; text-transform:uppercase; letter-spacing:0.05em; color:#8a8a90;">
+              <div>Customer</div><div>Object</div><div>Specs</div><div>Payment</div><div>Slicer file</div>
+            </div>
+            <sc-for list="{{ orders }}" as="order" hint-placeholder-count="3">
+              <div style="display:grid; grid-template-columns: 1.2fr 1fr 2fr 1fr 1.4fr; padding:16px 20px; border-top:1px solid #202023; font-size:13px; align-items:center;">
+                <div>
+                  <div style="font-weight:600;">{{ order.name }}</div>
+                  <div style="font-size:11px; color:#75757c;">{{ order.email }}</div>
+                </div>
+                <div>{{ order.type }}</div>
+                <div style="color:#b0b0b6; font-size:12px; line-height:1.5;">{{ order.specsText }}</div>
+                <div>
+                  <div onClick="{{ order.onTogglePaid }}" style="width:44px; height:24px; border-radius:12px; cursor:pointer; background: {{ order.toggleBg }}; position:relative;">
+                    <div style="width:18px; height:18px; border-radius:50%; background:#fff; position:absolute; top:3px; left: {{ order.toggleLeft }}; transition: left 0.15s;"></div>
+                  </div>
+                </div>
+                <div>
+                  <button style="background:#1f1f23; border:1px solid #2e2e32; color:#c9c9cd; padding:8px 12px; border-radius:6px; font-size:12px; cursor:pointer;" onClick="{{ order.onDownload }}">Download .3MF Slicer File</button>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ noOrders }}" hint-placeholder-val="{{ true }}">
+          <div style="padding:60px; text-align:center; color:#6b6b72; font-size:13px; border:1px dashed #232326; border-radius:10px;">No orders yet.</div>
+        </sc-if>
+      </div>
+    </sc-if>
+  </div>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+
+class Component extends DCLogic {
+  state = {
+    staffAuthed: false,
+    staffPwInput: '',
+    orders: [],
+  };
+
+  componentDidMount() {
+    this.checkSession();
+  }
+
+  async checkSession() {
+    const { checkSession, loadOrders } = await import('./shared.js');
+    const authed = await checkSession();
+    if (authed) {
+      this.setState({ staffAuthed: true });
+      const orders = await loadOrders();
+      this.setState({ orders });
+    }
+  }
+
+  async togglePaid(id) {
+    const { togglePaid } = await import('./shared.js');
+    const result = await togglePaid(id);
+    if (result) {
+      this.setState({ orders: this.state.orders.map(o => o.id === id ? { ...o, paid: result.paid } : o) });
+    }
+  }
+
+  async download3MF(order) {
+    const { download3MF } = await import('./shared.js');
+    await download3MF(order);
+  }
+
+  renderVals() {
+    const s = this.state;
+
+    const orders = s.orders.map(o => ({
+      ...o,
+      toggleBg: o.paid ? '#2f7a4f' : '#3a3a3f',
+      toggleLeft: o.paid ? '23px' : '3px',
+      onTogglePaid: () => this.togglePaid(o.id),
+      onDownload: () => this.download3MF(o),
+    }));
+
+    return {
+      staffLocked: !s.staffAuthed,
+      staffUnlocked: s.staffAuthed,
+      staffPwInput: s.staffPwInput,
+      onStaffPwChange: (e) => this.setState({ staffPwInput: e.target.value }),
+      staffLogin: async () => {
+        const { staffLogin, loadOrders } = await import('./shared.js');
+        const result = await staffLogin(s.staffPwInput);
+        if (result.ok) {
+          this.setState({ staffAuthed: true, staffPwInput: '' });
+          const orders = await loadOrders();
+          this.setState({ orders });
+        } else {
+          alert(result.error || 'Incorrect password.');
+        }
+      },
+      staffLogout: async () => {
+        const { staffLogout } = await import('./shared.js');
+        await staffLogout();
+        this.setState({ staffAuthed: false, orders: [] });
+      },
+      orders,
+      orderCount: s.orders.length,
+      hasOrders: s.orders.length > 0,
+      noOrders: s.orders.length === 0,
+    };
+  }
+}
+
+</script>
+</body>
+</html>
