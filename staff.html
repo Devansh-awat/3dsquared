@@ -81,7 +81,12 @@
                   </div>
                 </div>
                 <div>
-                  <button style="background:#1f1f23; border:1px solid #2e2e32; color:#c9c9cd; padding:8px 12px; border-radius:6px; font-size:12px; cursor:pointer;" onClick="{{ order.onDownload }}">Download .3MF Slicer File</button>
+                  <sc-if value="{{ order.canDownload3MF }}" hint-placeholder-val="{{ false }}">
+                    <button style="background:#1f1f23; border:1px solid #2e2e32; color:#c9c9cd; padding:8px 12px; border-radius:6px; font-size:12px; cursor:pointer;" onClick="{{ order.onDownload }}">Download .3MF Slicer File</button>
+                  </sc-if>
+                  <sc-if value="{{ order.cannotDownload3MF }}" hint-placeholder-val="{{ true }}">
+                    <div style="color:#5c5c62; font-size:12px;">Manual design — no file</div>
+                  </sc-if>
                 </div>
               </div>
             </sc-for>
@@ -141,6 +146,8 @@ class Component extends DCLogic {
       ...o,
       toggleBg: o.paid ? '#2f7a4f' : '#3a3a3f',
       toggleLeft: o.paid ? '23px' : '3px',
+      canDownload3MF: o.type === 'Keychain',
+      cannotDownload3MF: o.type !== 'Keychain',
       onTogglePaid: () => this.togglePaid(o.id),
       onDownload: () => this.download3MF(o),
     }));

@@ -44,7 +44,12 @@ static site plus a small Vercel serverless backend.
 - **3MF export**: `mf3-writer.js` builds a minimal, dependency-free `.3MF` (zip + 3MF XML) from an
   order's `dims`/color specs — simplified box geometry, not the precise engraved shape, just
   enough for a slicer to open. Used by the staff panel's "Download .3MF" button, via
-  `shared.js`'s `download3MF`.
+  `shared.js`'s `download3MF`. **The button only shows for `type === 'Keychain'` orders**
+  (`staff.html`'s `canDownload3MF`/`cannotDownload3MF`) — every other product type's `dims` are
+  hardcoded placeholder numbers with no real geometry behind them (PS5/Figurine/Logo/Other are
+  free-text descriptions manually reviewed by staff; bookmark has no SCAD/parametric design yet
+  either), so a "3MF" for them would be a meaningless generic box. Don't re-enable it for other
+  types without an actual geometry source for that product.
 - **Backend**: `/api/*.js` are Vercel Node serverless functions (zero-config — no framework).
   - `POST /api/staff-login` — checks the password against `STAFF_PASSWORD`, sets a signed,
     HttpOnly session cookie (HMAC'd with `SESSION_SECRET`, 8h expiry).
@@ -66,9 +71,11 @@ static site plus a small Vercel serverless backend.
   via `curl -A "<old UA>" https://fonts.googleapis.com/css2?family=...` (returns a `.woff` URL)
   and convert with `fontTools` (`TTFont(...).flavor = None; .save(...)`) if a plain static `.ttf`
   isn't available.
-- **Seed/demo data**: `scripts/seed.js` inserts a few sample orders (PS5 holder, a Manchester
-  United logo request, a bookmark) referencing photos committed under `uploads/`, so the staff
-  panel isn't empty on first deploy. These are demo rows, not real customers.
+- **No seed/demo data**: the `orders` table only ever holds real customer submissions. An earlier
+  version of this repo seeded 3 fake demo orders (PS5/logo/bookmark) — those were removed since
+  they were never actually asked for; don't re-add synthetic orders without being asked. The
+  `uploads/` photos (`ps5-holder.webp`, `manchester-united-logo.jpeg`, `bookmark.jpeg`) are still
+  used legitimately as real product photos on the catalog page (`index.html`) — keep those.
 
 ## Local setup
 
@@ -89,8 +96,13 @@ Then, with those pulled into `.env.local`:
 ```
 export $(grep -v '^#' .env.local | xargs)   # or use `dotenv -e .env.local -- ...`
 npm run migrate   # creates the orders table
-npm run seed      # inserts the demo PS5 / Man Utd logo / bookmark orders
 ```
+
+Note: in this Claude Code sandbox, `vercel env pull` returns redacted/empty values even though the
+same command works fine in a normal terminal — real secrets only resolve inside Vercel's actual
+serverless runtime here. To run one-off scripts against production data from this sandbox, add a
+temporary password-protected `/api/admin-*.js` endpoint, deploy, `curl` it once, then delete it —
+see git history for examples (`admin-init-db.js`, `admin-patch.js`, `admin-delete-seed.js`).
 
 Serve the static site locally with any static server (e.g. `python3 -m http.server`) — API
 routes only run under `vercel dev` or once deployed.
