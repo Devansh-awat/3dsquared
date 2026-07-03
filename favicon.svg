@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <rect width="64" height="64" rx="14" fill="#0d0d0f"/>
+  <text x="32" y="42" text-anchor="middle" font-family="'Space Grotesk', Arial, sans-serif" font-weight="700" font-size="30" fill="#f2f2f0">3D<tspan fill="#e2704f" font-size="20" dy="-10">2</tspan></text>
+</svg>

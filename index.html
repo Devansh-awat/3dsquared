@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" type="image/svg+xml" href="./favicon.svg">
 <script src="./support.js"></script>
 </head>
 <body>
@@ -16,6 +17,11 @@
   </script>
   <style>
     @font-face { font-family: 'Pacifico'; src: url('./fonts/Pacifico.ttf') format('truetype'); font-weight: 400; font-style: normal; }
+    @font-face { font-family: 'Bebas Neue'; src: url('./fonts/BebasNeue-Regular.ttf') format('truetype'); font-weight: 400; font-style: normal; }
+    @font-face { font-family: 'Permanent Marker'; src: url('./fonts/PermanentMarker-Regular.ttf') format('truetype'); font-weight: 400; font-style: normal; }
+    @font-face { font-family: 'Press Start 2P'; src: url('./fonts/PressStart2P-Regular.ttf') format('truetype'); font-weight: 400; font-style: normal; }
+    @font-face { font-family: 'Righteous'; src: url('./fonts/Righteous-Regular.ttf') format('truetype'); font-weight: 400; font-style: normal; }
+    @font-face { font-family: 'Roboto Mono Medium'; src: url('./fonts/RobotoMono-Medium.ttf') format('truetype'); font-weight: 500; font-style: normal; }
     * { box-sizing: border-box; }
     body { margin: 0; background: #0d0d0f; }
     ::-webkit-scrollbar { width: 10px; height: 10px; }
@@ -204,8 +210,20 @@
 
         <sc-if value="{{ bmShowForm }}" hint-placeholder-val="{{ true }}">
           <div>
-            <div style="font-size:12px; color:#8a8a90; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;">Engraved text</div>
+            <div style="font-size:12px; color:#8a8a90; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;">Shape</div>
+            <div style="display:flex; gap:10px; margin-bottom:20px;">
+              <sc-for list="{{ bmShapeOptions }}" as="opt" hint-placeholder-count="2">
+                <button style="flex:1; padding:12px 8px; border-radius:7px; font-size:13px; cursor:pointer; background: {{ opt.bg }}; border: 1px solid {{ opt.border }}; color: {{ opt.color }};" onClick="{{ opt.onClick }}">{{ opt.label }}</button>
+              </sc-for>
+            </div>
+
+            <div style="font-size:12px; color:#8a8a90; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;">{{ bmTextFieldLabel }}</div>
             <input value="{{ bmText }}" onChange="{{ onBmTextChange }}" maxlength="16" placeholder="Type the name or word to engrave" style="width:100%; background:#0d0d0f; border:1px solid #2e2e32; color:#f2f2f0; padding:12px 14px; border-radius:7px; font-size:15px; margin-bottom:24px;"/>
+
+            <sc-if value="{{ bmShowShapeDesc }}" hint-placeholder-val="{{ false }}">
+              <div style="font-size:12px; color:#8a8a90; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;">Describe the shape</div>
+              <textarea value="{{ bmShapeDesc }}" onChange="{{ onBmShapeDescChange }}" placeholder="e.g. an astronaut, a dinosaur, a cat silhouette — describe what you'd like the bookmark cut into" rows="3" style="width:100%; background:#0d0d0f; border:1px solid #2e2e32; color:#f2f2f0; padding:12px 14px; border-radius:7px; font-size:14px; margin-bottom:24px; resize:vertical;"></textarea>
+            </sc-if>
 
             <div style="font-size:12px; color:#8a8a90; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;">Base color</div>
             <div style="display:flex; gap:14px; margin-bottom:24px;">
@@ -528,7 +546,7 @@ class Component extends DCLogic {
     kfText: '', kfHousingColor: 'Black', kfKeycapColor: 'White',
     kfName: '', kfEmail: '', kfPhone: '',
 
-    bmText: '', bmSize: 'M', bmBaseColor: 'Black', bmTextColor: 'White',
+    bmText: '', bmSize: 'M', bmBaseColor: 'Black', bmTextColor: 'White', bmShape: 'flat', bmShapeDesc: '',
     bmName: '', bmEmail: '', bmPhone: '',
 
     figWhat: '', figColorDesc: '', figSize: '5',
@@ -559,6 +577,11 @@ class Component extends DCLogic {
   // (and upload the matching .ttf into fonts/) to offer more choices.
   KC_FONTS = {
     Pacifico: { file: './fonts/Pacifico.ttf', scadName: 'Pacifico:style=Regular', previewCss: "'Pacifico', cursive" },
+    'Bebas Neue': { file: './fonts/BebasNeue-Regular.ttf', scadName: 'Bebas Neue:style=Regular', previewCss: "'Bebas Neue', sans-serif" },
+    'Permanent Marker': { file: './fonts/PermanentMarker-Regular.ttf', scadName: 'Permanent Marker:style=Regular', previewCss: "'Permanent Marker', cursive" },
+    'Press Start 2P': { file: './fonts/PressStart2P-Regular.ttf', scadName: 'Press Start 2P:style=Regular', previewCss: "'Press Start 2P', monospace" },
+    Righteous: { file: './fonts/Righteous-Regular.ttf', scadName: 'Righteous:style=Regular', previewCss: "'Righteous', sans-serif" },
+    'Roboto Mono': { file: './fonts/RobotoMono-Medium.ttf', scadName: 'Roboto Mono Medium:style=Regular', previewCss: "'Roboto Mono Medium', monospace" },
   };
 
   kcCanvasRef = (node) => {
@@ -953,6 +976,18 @@ translate([2 * bore_size - chain_link_length, 0, 0]) difference() {
     // ---- Bookmark ----
     const bmDims = this.BM_DIMS.M;
     const bmPrice = 200;
+    const bmShapeOptions = [
+      { key: 'flat', label: 'Flat bookmark' },
+      { key: 'custom', label: 'Custom shape' },
+    ].map(opt => ({
+      label: opt.label,
+      bg: s.bmShape === opt.key ? this.ACCENT : '#0d0d0f',
+      color: s.bmShape === opt.key ? '#161616' : '#c9c9cd',
+      border: s.bmShape === opt.key ? this.ACCENT : '#2e2e32',
+      onClick: () => this.setState({ bmShape: opt.key }),
+    }));
+    const bmShowShapeDesc = s.bmShape === 'custom';
+    const bmTextFieldLabel = bmShowShapeDesc ? 'Text to include (optional)' : 'Engraved text';
     const bmBaseSwatches = this.COLOR_NAMES.map(name => ({
       name, hex: this.COLORS[name],
       ring: s.bmBaseColor === name ? this.ACCENT : '#2e2e32',
@@ -963,7 +998,8 @@ translate([2 * bore_size - chain_link_length, 0, 0]) difference() {
       ring: s.bmTextColor === name ? this.ACCENT : '#2e2e32',
       onClick: () => this.setState({ bmTextColor: name }),
     }));
-    const bmValid = this.isValidOrder(s.bmName, s.bmEmail, s.bmPhone);
+    const bmValid = this.isValidOrder(s.bmName, s.bmEmail, s.bmPhone)
+      && (!bmShowShapeDesc || s.bmShapeDesc.trim().length > 0);
 
     // ---- Figurine ----
     const figSizeOptions = ['3', '5', '7'].map(sz => ({
@@ -1072,20 +1108,25 @@ translate([2 * bore_size - chain_link_length, 0, 0]) difference() {
       // bookmark
       bmText: s.bmText, bmName: s.bmName, bmEmail: s.bmEmail, bmPhone: s.bmPhone,
       bmPrice, bmBaseSwatches, bmTextSwatches,
+      bmShapeOptions, bmShowShapeDesc, bmTextFieldLabel, bmShapeDesc: s.bmShapeDesc,
       bmShowConfirmation: !!(s.confirmation && s.page === 'bookmark'),
       bmShowForm: !(s.confirmation && s.page === 'bookmark'),
       bmSubmitDisabled: !bmValid,
       bmSubmitBg: bmValid ? this.ACCENT : '#2a2a2e',
       bmSubmitColor: bmValid ? '#161616' : '#6b6b72',
       onBmTextChange: (e) => this.setState({ bmText: e.target.value }),
+      onBmShapeDescChange: (e) => this.setState({ bmShapeDesc: e.target.value }),
       onBmNameChange: (e) => this.setState({ bmName: e.target.value }),
       onBmEmailChange: (e) => this.setState({ bmEmail: e.target.value }),
       onBmPhoneChange: (e) => this.setState({ bmPhone: e.target.value }),
       submitBookmark: () => {
         if (!bmValid) return;
+        const shapeText = bmShowShapeDesc
+          ? `Shape: Custom — "${s.bmShapeDesc.trim()}"${s.bmText ? ` · Text: "${s.bmText}"` : ''}`
+          : `Shape: Flat bookmark · Text: "${s.bmText}"`;
         this.submitOrder({
           name: s.bmName, email: s.bmEmail, phone: s.bmPhone, type: 'Bookmark',
-          specsText: `Text: "${s.bmText}" · Base: ${s.bmBaseColor} · Text color: ${s.bmTextColor}`,
+          specsText: `${shapeText} · Base: ${s.bmBaseColor} · Text color: ${s.bmTextColor}`,
           price: bmPrice, baseColorHex: this.COLORS[s.bmBaseColor], textColorHex: this.COLORS[s.bmTextColor],
           dims: { w: bmDims.w, d: bmDims.d, h: this.BM_BASE_H, textDepth: 0.6, hole: bmDims.hole },
         });
