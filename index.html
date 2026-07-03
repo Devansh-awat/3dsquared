@@ -474,10 +474,9 @@
       <sc-if value="{{ staffLocked }}" hint-placeholder-val="{{ true }}">
         <div style="max-width:380px; margin: 60px auto 0; background:#151517; border:1px solid #232326; border-radius:10px; padding:32px;">
           <div style="font-size:18px; font-weight:600; margin-bottom:6px;">Staff login</div>
-          <div style="font-size:12px; color:#8a8a90; margin-bottom:20px; line-height:1.5;">Prototype-only client-side gate. This must be replaced with real server-side authentication before going live.</div>
+          <div style="font-size:12px; color:#8a8a90; margin-bottom:20px; line-height:1.5;">Enter the staff password to view and manage orders.</div>
           <input type="password" value="{{ staffPwInput }}" onChange="{{ onStaffPwChange }}" placeholder="Password" style="width:100%; background:#0d0d0f; border:1px solid #2e2e32; color:#f2f2f0; padding:11px 14px; border-radius:7px; font-size:14px; margin-bottom:14px;"/>
           <button style="width:100%; padding:12px; border-radius:7px; border:none; background: oklch(0.7 0.16 25); color:#161616; font-weight:600; font-size:14px; cursor:pointer;" onClick="{{ staffLogin }}">Enter</button>
-          <div style="font-size:11px; color:#5c5c62; margin-top:14px;">demo password: staff123</div>
         </div>
       </sc-if>
 
@@ -486,18 +485,21 @@
           <div style="display:flex; align-items:baseline; justify-content:space-between; margin-bottom:24px;">
             <div>
               <div style="font-family:'Space Grotesk',sans-serif; font-size:26px; font-weight:600;">Orders</div>
-              <div style="font-size:12px; color:#8a8a90; margin-top:4px;">Client-side demo data only — connect a real backend for persistence across staff/devices.</div>
+              <div style="font-size:12px; color:#8a8a90; margin-top:4px;">Synced from the orders database — visible to any staff member who logs in.</div>
             </div>
-            <div style="font-size:13px; color:#c9c9cd;">{{ orderCount }} orders</div>
+            <div style="display:flex; align-items:center; gap:16px;">
+              <div style="font-size:13px; color:#c9c9cd;">{{ orderCount }} orders</div>
+              <div style="font-size:13px; color:#c9c9cd; cursor:pointer; border:1px solid #2e2e32; padding:8px 16px; border-radius:6px;" onClick="{{ staffLogout }}">Log out</div>
+            </div>
           </div>
 
           <sc-if value="{{ hasOrders }}" hint-placeholder-val="{{ false }}">
             <div style="border:1px solid #232326; border-radius:10px; overflow:hidden;">
-              <div style="display:grid; grid-template-columns: 1.2fr 1fr 2fr 1fr 1.4fr; background:#1a1a1d; padding:14px 20px; font-size:11px; text-transform:uppercase; letter-spacing:0.05em; color:#8a8a90;">
-                <div>Customer</div><div>Object</div><div>Specs</div><div>Payment</div><div>Slicer file</div>
+              <div style="display:grid; grid-template-columns: 1.1fr 1fr 1.8fr 0.7fr 0.8fr 1.4fr; background:#1a1a1d; padding:14px 20px; font-size:11px; text-transform:uppercase; letter-spacing:0.05em; color:#8a8a90;">
+                <div>Customer</div><div>Object</div><div>Specs</div><div>Payment</div><div>Photo</div><div>Slicer file</div>
               </div>
               <sc-for list="{{ orders }}" as="order" hint-placeholder-count="3">
-                <div style="display:grid; grid-template-columns: 1.2fr 1fr 2fr 1fr 1.4fr; padding:16px 20px; border-top:1px solid #202023; font-size:13px; align-items:center;">
+                <div style="display:grid; grid-template-columns: 1.1fr 1fr 1.8fr 0.7fr 0.8fr 1.4fr; padding:16px 20px; border-top:1px solid #202023; font-size:13px; align-items:center;">
                   <div>
                     <div style="font-weight:600;">{{ order.name }}</div>
                     <div style="font-size:11px; color:#75757c;">{{ order.email }}</div>
@@ -508,6 +510,16 @@
                     <div onClick="{{ order.onTogglePaid }}" style="width:44px; height:24px; border-radius:12px; cursor:pointer; background: {{ order.toggleBg }}; position:relative;">
                       <div style="width:18px; height:18px; border-radius:50%; background:#fff; position:absolute; top:3px; left: {{ order.toggleLeft }}; transition: left 0.15s;"></div>
                     </div>
+                  </div>
+                  <div>
+                    <sc-if value="{{ order.hasPhoto }}" hint-placeholder-val="{{ false }}">
+                      <a href="{{ order.photoUrl }}" target="_blank" rel="noopener">
+                        <img src="{{ order.photoUrl }}" style="width:44px; height:44px; object-fit:cover; border-radius:6px; border:1px solid #2e2e32;"/>
+                      </a>
+                    </sc-if>
+                    <sc-if value="{{ order.hasNoPhoto }}" hint-placeholder-val="{{ true }}">
+                      <div style="color:#5c5c62; font-size:12px;">—</div>
+                    </sc-if>
                   </div>
                   <div>
                     <button style="background:#1f1f23; border:1px solid #2e2e32; color:#c9c9cd; padding:8px 12px; border-radius:6px; font-size:12px; cursor:pointer;" onClick="{{ order.onDownload }}">Download .3MF Slicer File</button>
@@ -851,9 +863,26 @@ translate([2 * bore_size - chain_link_length, 0, 0]) difference() {
   };
 
   componentDidMount() {
+    this.checkSession();
+  }
+
+  async checkSession() {
     try {
-      const saved = JSON.parse(localStorage.getItem('td2_orders') || '[]');
-      this.setState({ orders: saved });
+      const r = await fetch('/api/session');
+      const data = await r.json();
+      if (data.authed) {
+        this.setState({ staffAuthed: true });
+        this.loadOrders();
+      }
+    } catch (e) {}
+  }
+
+  async loadOrders() {
+    try {
+      const r = await fetch('/api/orders');
+      if (!r.ok) return;
+      const data = await r.json();
+      this.setState({ orders: data.orders });
     } catch (e) {}
   }
 
@@ -861,20 +890,31 @@ translate([2 * bore_size - chain_link_length, 0, 0]) difference() {
     return !!(name && name.trim() && /\S+@\S+\.\S+/.test(email || '') && phone && phone.trim().length >= 7);
   }
 
-  saveOrders(orders) {
-    localStorage.setItem('td2_orders', JSON.stringify(orders));
-    this.setState({ orders });
+  async submitOrder(order) {
+    try {
+      const r = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(order),
+      });
+      const data = await r.json();
+      if (r.ok) {
+        this.setState({ confirmation: data.order });
+      } else {
+        alert('Could not submit your order: ' + (data.error || 'unknown error'));
+      }
+    } catch (e) {
+      alert('Could not reach the server to submit your order. Please try again.');
+    }
   }
 
-  submitOrder(order) {
-    const full = { id: 'TD2-' + Date.now().toString(36).toUpperCase(), createdAt: new Date().toISOString(), paid: false, ...order };
-    this.saveOrders([full, ...this.state.orders]);
-    this.setState({ confirmation: full });
-  }
-
-  togglePaid(id) {
-    const orders = this.state.orders.map(o => o.id === id ? { ...o, paid: !o.paid } : o);
-    this.saveOrders(orders);
+  async togglePaid(id) {
+    try {
+      const r = await fetch(`/api/orders/${id}/toggle-paid`, { method: 'PATCH' });
+      if (!r.ok) return;
+      const data = await r.json();
+      this.setState({ orders: this.state.orders.map(o => o.id === id ? { ...o, paid: data.paid } : o) });
+    } catch (e) {}
   }
 
   // ---------------- .3MF export (see mf3-writer.js for geometry generation) ----------------
@@ -1033,6 +1073,8 @@ translate([2 * bore_size - chain_link_length, 0, 0]) difference() {
       ...o,
       toggleBg: o.paid ? '#2f7a4f' : '#3a3a3f',
       toggleLeft: o.paid ? '23px' : '3px',
+      hasPhoto: !!o.photoUrl,
+      hasNoPhoto: !o.photoUrl,
       onTogglePaid: () => this.togglePaid(o.id),
       onDownload: () => this.download3MF(o),
     }));
@@ -1225,9 +1267,27 @@ translate([2 * bore_size - chain_link_length, 0, 0]) difference() {
       staffUnlocked: s.staffAuthed,
       staffPwInput: s.staffPwInput,
       onStaffPwChange: (e) => this.setState({ staffPwInput: e.target.value }),
-      staffLogin: () => {
-        if (s.staffPwInput === 'staff123') this.setState({ staffAuthed: true });
-        else alert('Incorrect password.\n\nThis is a client-side demo gate only — replace with real server-side authentication before deploying.');
+      staffLogin: async () => {
+        try {
+          const r = await fetch('/api/staff-login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ password: s.staffPwInput }),
+          });
+          if (r.ok) {
+            this.setState({ staffAuthed: true, staffPwInput: '' });
+            this.loadOrders();
+          } else {
+            const data = await r.json().catch(() => ({}));
+            alert(data.error || 'Incorrect password.');
+          }
+        } catch (e) {
+          alert('Could not reach the server. Please try again.');
+        }
+      },
+      staffLogout: async () => {
+        try { await fetch('/api/staff-logout', { method: 'POST' }); } catch (e) {}
+        this.setState({ staffAuthed: false, orders: [] });
       },
       orders,
       orderCount: s.orders.length,
