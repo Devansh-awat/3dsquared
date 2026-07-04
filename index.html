@@ -59,13 +59,20 @@
       </div>
       <div class="hero-visual fade-up">
         <div class="print-stack">
-          <div class="print-rings">
-            <sc-for list="{{ heroBars }}" as="bar" hint-placeholder-count="5">
-              <div class="print-ring" style="width: {{ bar.size }}; height: {{ bar.size }}; background: {{ bar.ringBg }};"></div>
+          <div class="hero-visual-mark">3D<span>²</span></div>
+          <div class="print-row-wrap">
+            <sc-for list="{{ heroRows }}" as="row" hint-placeholder-count="9">
+              <div class="print-row" style="width: {{ row.widthPx }}; background: {{ row.fillBg }};">
+                <sc-if value="{{ row.showNozzle }}" hint-placeholder-val="{{ false }}">
+                  <div class="print-nozzle" style="left: {{ row.nozzlePct }}%;">
+                    <div class="print-nozzle-tip"></div>
+                    <div class="print-nozzle-glow"></div>
+                  </div>
+                </sc-if>
+              </div>
             </sc-for>
-            <div class="hero-visual-mark">3D<span>²</span></div>
           </div>
-          <div class="print-readout">LAYER <b>{{ heroLayerLabel }}</b> / 5 — <b>{{ heroPctLabel }}</b>%</div>
+          <div class="print-readout">LAYER <b>{{ heroLayerLabel }}</b> / {{ heroLayerTotal }} — <b>{{ heroPctLabel }}</b>%</div>
         </div>
       </div>
     </div>
@@ -154,6 +161,7 @@
 
 class Component extends DCLogic {
   state = { heroLayer: 0, heroPct: 0 };
+  HERO_ROWS = 9;
 
   componentDidMount() {
     this._heroTimer = setInterval(() => this.tickHero(), 45);
@@ -161,24 +169,29 @@ class Component extends DCLogic {
 
   tickHero() {
     let { heroLayer, heroPct } = this.state;
-    heroPct += 3;
+    heroPct += 4;
     if (heroPct >= 100) {
       heroPct = 0;
-      heroLayer = (heroLayer + 1) % 5;
+      heroLayer = (heroLayer + 1) % this.HERO_ROWS;
     }
     this.setState({ heroLayer, heroPct });
   }
 
   renderVals() {
     const { heroLayer, heroPct } = this.state;
-    const ringSizes = [190, 152, 114, 76, 38];
-    const heroBars = ringSizes.map((size, i) => {
-      const pct = i < heroLayer ? 100 : (i === heroLayer ? heroPct : 0);
-      const deg = (pct / 100) * 360;
-      const ringBg = `conic-gradient(from -90deg, var(--accent) ${deg}deg, var(--border-strong) ${deg}deg 360deg)`;
-      return { size: size + 'px', ringBg };
+    const N = this.HERO_ROWS;
+    const R = 78;
+    // Side view of a sphere being printed bottom-to-top: each row's width is the
+    // sphere's chord length at that height (widest at the equator, narrow at the poles).
+    const heroRows = Array.from({ length: N }, (_, j) => {
+      const angle = ((j + 0.5) / N) * Math.PI;
+      const widthPx = Math.max(10, Math.round(2 * R * Math.sin(angle)));
+      const pct = j < heroLayer ? 100 : (j === heroLayer ? heroPct : 0);
+      const fillBg = `linear-gradient(to right, var(--accent) ${pct}%, var(--border-strong) ${pct}%)`;
+      return { widthPx: widthPx + 'px', fillBg, showNozzle: j === heroLayer, nozzlePct: pct };
     });
     const heroLayerLabel = String(heroLayer + 1);
+    const heroLayerTotal = String(N);
     const heroPctLabel = String(heroPct);
 
     const catalogItems = [
@@ -191,7 +204,7 @@ class Component extends DCLogic {
       { name: 'Articulated Finger Extensions', price: 'From ₹800', cta: 'Order now', href: '/hand.html', photoUrl: '/uploads/articulated-hand.jpeg', hasPhoto: true, hasNoPhoto: false, desc: 'Jointed, wearable mechanical claws for cosplay and costumes — fully articulated at every knuckle.' },
       { name: 'Something else?', price: 'Custom quote', cta: 'Describe your idea', href: '/other.html', hasPhoto: false, hasNoPhoto: true, iconKeychain: false, iconKeycap: false, iconFigurine: false, iconOther: true, desc: "Don't see what you need — tell us what you'd like printed." },
     ];
-    return { catalogItems, heroBars, heroLayerLabel, heroPctLabel };
+    return { catalogItems, heroRows, heroLayerLabel, heroLayerTotal, heroPctLabel };
   }
 }
 
