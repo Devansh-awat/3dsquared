@@ -299,10 +299,10 @@ a { color: inherit; }
 
 .print-stack { position: relative; display: flex; flex-direction: column; align-items: center; }
 .print-row-wrap {
-  display: flex; flex-direction: column-reverse; align-items: center; gap: 2px;
+  display: flex; flex-direction: column-reverse; align-items: center; gap: 3px;
 }
 .print-row {
-  height: 6px; border-radius: 2px; position: relative;
+  height: 15px; border-radius: 3px; position: relative;
 }
 .print-nozzle {
   position: absolute; bottom: 100%; transform: translate(-50%, 0);
