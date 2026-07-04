@@ -30,11 +30,11 @@
   </div>
 
   <!-- ARTICULATED HAND -->
-  <div class="container-narrow">
+  <div class="container-product">
     <a href="/index.html" class="nav-back">← Back to catalog</a>
 
     <sc-if value="{{ handShowConfirmation }}" hint-placeholder-val="{{ false }}">
-      <div class="confirmation fade-up">
+      <div class="confirmation fade-up" style="max-width:640px;">
         <div class="confirmation-title">Request received ✓</div>
         <div class="confirmation-body">Order ID: {{ confirmation.id }}<br/>We'll follow up by email/phone to confirm final price and details. Payment is not collected on this site.</div>
         <a href="/index.html" class="btn btn-secondary" style="margin-top:20px;">Back to catalog</a>
@@ -45,55 +45,60 @@
       <div class="fade-up">
         <div class="eyebrow">Articulated Finger Extensions</div>
         <div class="h1" style="font-size:28px; margin-bottom:8px;">Wearable mechanical claws</div>
-        <div class="lede" style="font-size:13.5px; margin-bottom:22px;">Jointed, wearable finger extensions — built for cosplay, costumes, and anyone who wants mechanical claws. Fully articulated at every knuckle.</div>
+        <div class="lede" style="font-size:13.5px; margin-bottom:26px; max-width:640px;">Jointed, wearable finger extensions — built for cosplay, costumes, and anyone who wants mechanical claws. Fully articulated at every knuckle.</div>
 
-        <div class="card" style="overflow:hidden; margin-bottom:26px;">
-          <img src="/uploads/articulated-hand.jpeg" alt="Articulated finger extension prototype, worn on a hand" style="width:100%; display:block; max-height:420px; object-fit:cover;"/>
-        </div>
-
-        <div class="card card-pad">
-          <div class="section" style="display:flex; gap:8px; flex-wrap:wrap;">
-            <div class="badge badge-neutral">PLA</div>
-            <div class="badge badge-neutral">~95g per hand</div>
-            <div class="badge badge-neutral">4–5 day turnaround</div>
-          </div>
-
-          <div class="section">
-            <label class="field-label">Hand size / fit</label>
-            <div class="segmented">
-              <sc-for list="{{ handSizeOptions }}" as="opt" hint-placeholder-count="3">
-                <button class="seg-btn {{ opt.activeClass }}" onClick="{{ opt.onClick }}">{{ opt.label }}</button>
+        <div class="product-layout">
+          <div class="product-media">
+            <div class="product-gallery-main">
+              <img src="{{ handActivePhoto }}" alt="Articulated finger extension prototype, worn on a hand"/>
+            </div>
+            <div class="product-gallery-thumbs">
+              <sc-for list="{{ handPhotos }}" as="photo" hint-placeholder-count="4">
+                <div class="product-gallery-thumb {{ photo.activeClass }}" onClick="{{ photo.onClick }}">
+                  <img src="{{ photo.url }}" alt="Articulated finger extension, alternate view"/>
+                </div>
               </sc-for>
             </div>
-            <div class="hint">Not sure? Give us a finger length in the notes and we'll size it.</div>
           </div>
 
-          <div class="section">
-            <label class="field-label">Color / finish</label>
-            <textarea value="{{ handColorDesc }}" onChange="{{ onHandColorChange }}" placeholder="e.g. gunmetal black, or gold-tipped claws" rows="2" class="textarea input"></textarea>
+          <div class="card card-pad">
+            <div class="section">
+              <label class="field-label">Hand size / fit</label>
+              <div class="segmented">
+                <sc-for list="{{ handSizeOptions }}" as="opt" hint-placeholder-count="3">
+                  <button class="seg-btn {{ opt.activeClass }}" onClick="{{ opt.onClick }}">{{ opt.label }}</button>
+                </sc-for>
+              </div>
+              <div class="hint">Not sure? Give us a finger length in the notes and we'll size it.</div>
+            </div>
+
+            <div class="section">
+              <label class="field-label">Color / finish</label>
+              <textarea value="{{ handColorDesc }}" onChange="{{ onHandColorChange }}" placeholder="e.g. gunmetal black, or gold-tipped claws" rows="2" class="textarea input"></textarea>
+            </div>
+
+            <div class="section">
+              <label class="field-label">Notes (fit, character reference, etc.)</label>
+              <textarea value="{{ handNotes }}" onChange="{{ onHandNotesChange }}" placeholder="Anything else we should know — finger length, reference character, single hand or a pair" rows="3" class="textarea input"></textarea>
+            </div>
+
+            <hr class="divider"/>
+
+            <div class="section">
+              <label class="field-label">Your details</label>
+              <div class="field"><input value="{{ handName }}" onChange="{{ onHandNameChange }}" placeholder="Full name" class="input"/></div>
+              <div class="field"><input value="{{ handEmail }}" onChange="{{ onHandEmailChange }}" placeholder="Email" class="input"/></div>
+              <div class="field"><input value="{{ handPhone }}" onChange="{{ onHandPhoneChange }}" placeholder="Phone number" class="input"/></div>
+            </div>
+
+            <div class="price-row">
+              <div class="price-label">Starting price</div>
+              <div class="price-value">From ₹800</div>
+            </div>
+            <div class="hint" style="margin-bottom:16px;">Final price depends on size and finish — quoted after we review your request.</div>
+
+            <button disabled="{{ handSubmitDisabled }}" class="btn btn-primary btn-block" onClick="{{ submitHand }}">Submit order request</button>
           </div>
-
-          <div class="section">
-            <label class="field-label">Notes (fit, character reference, etc.)</label>
-            <textarea value="{{ handNotes }}" onChange="{{ onHandNotesChange }}" placeholder="Anything else we should know — finger length, reference character, single hand or a pair" rows="3" class="textarea input"></textarea>
-          </div>
-
-          <hr class="divider"/>
-
-          <div class="section">
-            <label class="field-label">Your details</label>
-            <div class="field"><input value="{{ handName }}" onChange="{{ onHandNameChange }}" placeholder="Full name" class="input"/></div>
-            <div class="field"><input value="{{ handEmail }}" onChange="{{ onHandEmailChange }}" placeholder="Email" class="input"/></div>
-            <div class="field"><input value="{{ handPhone }}" onChange="{{ onHandPhoneChange }}" placeholder="Phone number" class="input"/></div>
-          </div>
-
-          <div class="price-row">
-            <div class="price-label">Starting price</div>
-            <div class="price-value">From ₹800</div>
-          </div>
-          <div class="hint" style="margin-bottom:16px;">Final price depends on size and finish — quoted after we review your request.</div>
-
-          <button disabled="{{ handSubmitDisabled }}" class="btn btn-primary btn-block" onClick="{{ submitHand }}">Submit order request</button>
         </div>
       </div>
     </sc-if>
@@ -118,11 +123,17 @@
 class Component extends DCLogic {
   state = {
     confirmation: null,
-    handSize: 'M', handColorDesc: '', handNotes: '',
+    handSize: 'M', handColorDesc: '', handNotes: '', handActiveIndex: 0,
     handName: '', handEmail: '', handPhone: '',
   };
 
   ACCENT = 'oklch(0.7 0.16 25)';
+  HAND_PHOTOS = [
+    '/uploads/articulated-hand-1.jpeg',
+    '/uploads/articulated-hand-2.jpeg',
+    '/uploads/articulated-hand-3.jpeg',
+    '/uploads/articulated-hand-4.jpeg',
+  ];
 
   isValidOrder(name, email, phone) {
     return !!(name && name.trim() && /\S+@\S+\.\S+/.test(email || '') && phone && phone.trim().length >= 7);
@@ -142,10 +153,17 @@ class Component extends DCLogic {
       activeClass: s.handSize === sz ? 'active' : '',
       onClick: () => this.setState({ handSize: sz }),
     }));
+    const handPhotos = this.HAND_PHOTOS.map((url, i) => ({
+      url,
+      activeClass: s.handActiveIndex === i ? 'active' : '',
+      onClick: () => this.setState({ handActiveIndex: i }),
+    }));
+    const handActivePhoto = this.HAND_PHOTOS[s.handActiveIndex] || this.HAND_PHOTOS[0];
     const handValid = this.isValidOrder(s.handName, s.handEmail, s.handPhone);
 
     return {
       handSizeOptions, handColorDesc: s.handColorDesc, handNotes: s.handNotes,
+      handPhotos, handActivePhoto,
       handName: s.handName, handEmail: s.handEmail, handPhone: s.handPhone,
       handShowConfirmation: !!s.confirmation,
       handShowForm: !s.confirmation,

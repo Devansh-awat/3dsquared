@@ -93,9 +93,16 @@ static site plus a small Vercel serverless backend.
   version of this repo seeded 3 fake demo orders (PS5/logo/bookmark) — those were removed since
   they were never actually asked for; don't re-add synthetic orders without being asked. The
   `uploads/` photos (`ps5-holder.webp`, `manchester-united-logo.jpeg`, `bookmark.jpeg`,
-  `articulated-hand.jpeg`) are still used legitimately as real product photos on the catalog page
-  (`index.html`) — keep those. `articulated-hand.jpeg` was pulled from the companion
-  3d-squared.vercel.app site's `/ProductPictures/` (same business, so fair game — see above).
+  `articulated-hand-1.jpeg` through `-4.jpeg`) are still used legitimately as real product photos
+  on the catalog page (`index.html`) — keep those. The `articulated-hand-*.jpeg` files were pulled
+  from the companion 3d-squared.vercel.app site's `/ProductPictures/` (same business, so fair game
+  — see above).
+- **Product page layout**: pages with visual media (`keychain.html`'s live 3D preview,
+  `hand.html`'s photo gallery) use `.container-product` + `.product-layout` (from `styles.css`) —
+  a two-column grid with media on the left and the configurator card on the right, collapsing to a
+  single stacked column (media first) under 860px. Product pages that are pure text forms with no
+  media (ps5/figurine/logo/other) stay on `.container-narrow` — don't force the two-column layout
+  onto them without an actual image/preview to put in the left column.
 
 ## Local setup
 
