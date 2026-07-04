@@ -58,7 +58,17 @@
         </div>
       </div>
       <div class="hero-visual fade-up">
-        <div class="hero-visual-mark">3D<span>²</span></div>
+        <div class="print-stack">
+          <div class="hero-visual-mark">3D<span>²</span></div>
+          <div class="print-bars">
+            <sc-for list="{{ heroBars }}" as="bar" hint-placeholder-count="5">
+              <div class="print-bar">
+                <div class="print-bar-fill" style="height: {{ bar.heightStyle }};"></div>
+              </div>
+            </sc-for>
+          </div>
+          <div class="print-readout">LAYER <b>{{ heroLayerLabel }}</b> / 5 — <b>{{ heroPctLabel }}</b>%</div>
+        </div>
       </div>
     </div>
 
@@ -145,9 +155,31 @@
 <script type="text/x-dc" data-dc-script>
 
 class Component extends DCLogic {
-  state = {};
+  state = { heroLayer: 0, heroPct: 0 };
+
+  componentDidMount() {
+    this._heroTimer = setInterval(() => this.tickHero(), 45);
+  }
+
+  tickHero() {
+    let { heroLayer, heroPct } = this.state;
+    heroPct += 3;
+    if (heroPct >= 100) {
+      heroPct = 0;
+      heroLayer = (heroLayer + 1) % 5;
+    }
+    this.setState({ heroLayer, heroPct });
+  }
 
   renderVals() {
+    const { heroLayer, heroPct } = this.state;
+    const heroBars = [0, 1, 2, 3, 4].map((i) => {
+      const pct = i < heroLayer ? 100 : (i === heroLayer ? heroPct : 0);
+      return { heightStyle: pct + '%' };
+    });
+    const heroLayerLabel = String(heroLayer + 1);
+    const heroPctLabel = String(heroPct);
+
     const catalogItems = [
       { name: 'Custom Keychain', price: 'From ₹180', cta: 'Customize', href: '/keychain.html', hasPhoto: false, hasNoPhoto: true, iconKeychain: true, iconKeycap: false, iconFigurine: false, iconOther: false, desc: 'Engrave any name or word — pick a font, size and colors.' },
       { name: 'Custom Bookmark', price: '₹200', cta: 'Customize', href: '/bookmark.html', photoUrl: '/uploads/bookmark.jpeg', hasPhoto: true, hasNoPhoto: false, desc: 'Engrave any name or word, pick colors — or describe a custom shape.' },
@@ -157,7 +189,7 @@ class Component extends DCLogic {
       { name: 'Custom Logos', price: 'From ₹200', cta: 'Order now', href: '/logo.html', photoUrl: '/uploads/manchester-united-logo.jpeg', hasPhoto: true, hasNoPhoto: false, desc: 'Any logo or brand mark, printed on a keychain, plaque or board.' },
       { name: 'Something else?', price: 'Custom quote', cta: 'Describe your idea', href: '/other.html', hasPhoto: false, hasNoPhoto: true, iconKeychain: false, iconKeycap: false, iconFigurine: false, iconOther: true, desc: "Don't see what you need — tell us what you'd like printed." },
     ];
-    return { catalogItems };
+    return { catalogItems, heroBars, heroLayerLabel, heroPctLabel };
   }
 }
 
