@@ -29,13 +29,61 @@
     </div>
   </div>
 
-  <!-- CATALOG -->
-  <div class="container">
-    <div class="fade-up" style="max-width:660px; margin-bottom:52px;">
-      <div class="badge badge-accent" style="margin-bottom:18px;">On-demand · pay on delivery/pickup</div>
-      <div class="h1" style="font-size:44px;">Custom 3D printing, made simple.</div>
-      <div class="lede" style="font-size:16.5px; margin-top:16px;">Design your piece, preview it in real time, and we print it on-demand. Prices shown are starting points in INR.</div>
+  <!-- HERO -->
+  <div class="container" style="padding-bottom:0;">
+    <div class="hero">
+      <div class="fade-up">
+        <div class="hero-eyebrow-row">
+          <div class="badge badge-accent">On-demand · pay on delivery/pickup</div>
+        </div>
+        <div class="h1 hero-title">Your design.<br/>Printed for real.</div>
+        <div class="lede hero-lede">Configure a keychain, bookmark, keycap toy and more — see it rendered before you order, then we print it and you pay when it arrives. Nothing charged upfront.</div>
+        <div class="hero-ctas">
+          <a href="#catalog" class="btn btn-primary">Browse the catalog</a>
+          <a href="/other.html" class="btn btn-secondary">Have a custom idea?</a>
+        </div>
+        <div class="stat-row">
+          <div>
+            <div class="stat-value">₹180</div>
+            <div class="stat-label">Starting price</div>
+          </div>
+          <div>
+            <div class="stat-value">7</div>
+            <div class="stat-label">Product types</div>
+          </div>
+          <div>
+            <div class="stat-value">₹0</div>
+            <div class="stat-label">Paid upfront</div>
+          </div>
+        </div>
+      </div>
+      <div class="hero-visual fade-up">
+        <div class="hero-visual-mark">3D<span>²</span></div>
+      </div>
     </div>
+
+    <div class="steps fade-up">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div class="step-title">Design & preview</div>
+        <div class="step-desc">Pick a product, set colors, size and text — some previews render live in your browser.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <div class="step-title">Submit your order</div>
+        <div class="step-desc">We review the spec and follow up by email or phone to confirm details.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <div class="step-title">Pay on delivery</div>
+        <div class="step-desc">No payment collected on this site — settle up on pickup or delivery.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CATALOG -->
+  <div class="container" id="catalog" style="padding-top:0;">
+    <div class="eyebrow fade-up">The catalog</div>
 
     <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap:22px;">
       <sc-for list="{{ catalogItems }}" as="item" hint-placeholder-count="7">
@@ -46,16 +94,27 @@
             </div>
           </sc-if>
           <sc-if value="{{ item.hasNoPhoto }}" hint-placeholder-val="{{ true }}">
-            <div style="height:180px; background: repeating-linear-gradient(45deg, #17171a, #17171a 10px, #1c1c20 10px, #1c1c20 20px); display:flex; align-items:center; justify-content:center;">
-              <div style="font-family:'Courier New',monospace; font-size:11.5px; color:var(--text-faint); letter-spacing:0.05em;">{{ item.photoLabel }}</div>
+            <div class="icon-tile">
+              <sc-if value="{{ item.iconKeychain }}" hint-placeholder-val="{{ false }}">
+                <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="15" cy="13" r="7"/><circle cx="15" cy="13" r="2.6"/><path d="M18 18 L24 24"/><rect x="21" y="23" width="15" height="20" rx="4"/><circle cx="28.5" cy="29" r="1.8" fill="currentColor" stroke="none"/></svg>
+              </sc-if>
+              <sc-if value="{{ item.iconKeycap }}" hint-placeholder-val="{{ false }}">
+                <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="16" width="12" height="16" rx="3"/><rect x="18" y="16" width="12" height="16" rx="3"/><rect x="30" y="16" width="12" height="16" rx="3"/><circle cx="12" cy="24" r="1.6" fill="currentColor" stroke="none"/><circle cx="24" cy="24" r="1.6" fill="currentColor" stroke="none"/><circle cx="36" cy="24" r="1.6" fill="currentColor" stroke="none"/></svg>
+              </sc-if>
+              <sc-if value="{{ item.iconFigurine }}" hint-placeholder-val="{{ false }}">
+                <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="24" cy="11" r="6"/><path d="M14 42 L16 24 Q24 20 32 24 L34 42"/><path d="M16 24 L9 34 M32 24 L39 34"/></svg>
+              </sc-if>
+              <sc-if value="{{ item.iconOther }}" hint-placeholder-val="{{ true }}">
+                <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M24 6a11 11 0 0 0-6 20c1.4 1 2 2.3 2 4v2h8v-2c0-1.7.6-3 2-4a11 11 0 0 0-6-20Z"/><path d="M20 38h8M21.5 42h5"/></svg>
+              </sc-if>
             </div>
           </sc-if>
           <div style="padding:22px; display:flex; flex-direction:column; gap:10px; flex:1;">
             <div style="font-size:16.5px; font-weight:600;">{{ item.name }}</div>
             <div style="font-size:13px; color:var(--text-dim); line-height:1.55; flex:1;">{{ item.desc }}</div>
-            <div style="display:flex; align-items:center; justify-content:space-between; margin-top:10px;">
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-top:10px;">
               <div style="font-size:15px; font-weight:600; color: var(--accent);">{{ item.price }}</div>
-              <div class="btn btn-primary" style="padding:9px 16px; font-size:13px;">{{ item.cta }}</div>
+              <div class="btn btn-primary" style="padding:9px 16px; font-size:13px; white-space:nowrap;">{{ item.cta }}</div>
             </div>
           </div>
         </a>
@@ -90,13 +149,13 @@ class Component extends DCLogic {
 
   renderVals() {
     const catalogItems = [
-      { name: 'Custom Keychain', price: 'From ₹180', cta: 'Customize', href: '/keychain.html', photoLabel: 'PRODUCT PHOTO — KEYCHAIN', hasPhoto: false, hasNoPhoto: true, desc: 'Engrave any name or word — pick a font, size and colors.' },
+      { name: 'Custom Keychain', price: 'From ₹180', cta: 'Customize', href: '/keychain.html', hasPhoto: false, hasNoPhoto: true, iconKeychain: true, iconKeycap: false, iconFigurine: false, iconOther: false, desc: 'Engrave any name or word — pick a font, size and colors.' },
       { name: 'Custom Bookmark', price: '₹200', cta: 'Customize', href: '/bookmark.html', photoUrl: '/uploads/bookmark.jpeg', hasPhoto: true, hasNoPhoto: false, desc: 'Engrave any name or word, pick colors — or describe a custom shape.' },
-      { name: 'Keycap Fidget Toy', price: 'From ₹300', cta: 'Customize', href: '/keycap.html', photoLabel: 'PRODUCT PHOTO — KEYCAP FIDGET', hasPhoto: false, hasNoPhoto: true, desc: 'A row of clicky keycaps in a housing — one per letter of a name or word.' },
+      { name: 'Keycap Fidget Toy', price: 'From ₹300', cta: 'Customize', href: '/keycap.html', hasPhoto: false, hasNoPhoto: true, iconKeychain: false, iconKeycap: true, iconFigurine: false, iconOther: false, desc: 'A row of clicky keycaps in a housing — one per letter of a name or word.' },
       { name: 'PS5 Controller / Holder', price: 'From ₹300', cta: 'Order now', href: '/ps5.html', photoUrl: '/uploads/ps5-holder.webp', hasPhoto: true, hasNoPhoto: false, desc: 'Sturdy stand for controller, sized for standard PS5 controllers. Final price depends on design complexity.' },
-      { name: 'Action Figures / Mini Figures', price: 'From ₹250', cta: 'Order now', href: '/figurine.html', photoLabel: 'PRODUCT PHOTO — FIGURINE', hasPhoto: false, hasNoPhoto: true, desc: 'Custom mini figures — describe the character, colors and size.' },
+      { name: 'Action Figures / Mini Figures', price: 'From ₹250', cta: 'Order now', href: '/figurine.html', hasPhoto: false, hasNoPhoto: true, iconKeychain: false, iconKeycap: false, iconFigurine: true, iconOther: false, desc: 'Custom mini figures — describe the character, colors and size.' },
       { name: 'Custom Logos', price: 'From ₹200', cta: 'Order now', href: '/logo.html', photoUrl: '/uploads/manchester-united-logo.jpeg', hasPhoto: true, hasNoPhoto: false, desc: 'Any logo or brand mark, printed on a keychain, plaque or board.' },
-      { name: 'Something else?', price: 'Custom quote', cta: 'Describe your idea', href: '/other.html', photoLabel: 'PRODUCT PHOTO — YOUR IDEA', hasPhoto: false, hasNoPhoto: true, desc: "Don't see what you need — tell us what you'd like printed." },
+      { name: 'Something else?', price: 'Custom quote', cta: 'Describe your idea', href: '/other.html', hasPhoto: false, hasNoPhoto: true, iconKeychain: false, iconKeycap: false, iconFigurine: false, iconOther: true, desc: "Don't see what you need — tell us what you'd like printed." },
     ];
     return { catalogItems };
   }
