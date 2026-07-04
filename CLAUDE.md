@@ -2,7 +2,8 @@
 
 ## Working agreement
 
-- **Auto-commit**: after making a change in this repo, commit it (with a clear message) without waiting to be asked. Don't push automatically — pushing to `origin` still needs a go-ahead.
+- **Auto-commit and push**: after making a change in this repo, commit it (with a clear message) and push to `origin` without waiting to be asked.
+- **Checking external sites**: when asked to look at another site (e.g. for a UI comparison), verify page-level facts (routes, status codes, raw markup) with `curl`, not just the browser tool. Client-rendered SPAs 404 on direct/raw requests to routes the server has no rewrite for, even when in-app navigation to those same routes works fine client-side — don't conflate the two.
 - **Keep this file current**: whenever a change alters the architecture, file layout, env vars, or setup steps described below, update this CLAUDE.md in the same commit.
 
 ## What this is
