@@ -59,13 +59,11 @@
       </div>
       <div class="hero-visual fade-up">
         <div class="print-stack">
-          <div class="hero-visual-mark">3D<span>²</span></div>
-          <div class="print-bars">
+          <div class="print-rings">
             <sc-for list="{{ heroBars }}" as="bar" hint-placeholder-count="5">
-              <div class="print-bar">
-                <div class="print-bar-fill" style="height: {{ bar.heightStyle }};"></div>
-              </div>
+              <div class="print-ring" style="width: {{ bar.size }}; height: {{ bar.size }}; background: {{ bar.ringBg }};"></div>
             </sc-for>
+            <div class="hero-visual-mark">3D<span>²</span></div>
           </div>
           <div class="print-readout">LAYER <b>{{ heroLayerLabel }}</b> / 5 — <b>{{ heroPctLabel }}</b>%</div>
         </div>
@@ -173,9 +171,12 @@ class Component extends DCLogic {
 
   renderVals() {
     const { heroLayer, heroPct } = this.state;
-    const heroBars = [0, 1, 2, 3, 4].map((i) => {
+    const ringSizes = [190, 152, 114, 76, 38];
+    const heroBars = ringSizes.map((size, i) => {
       const pct = i < heroLayer ? 100 : (i === heroLayer ? heroPct : 0);
-      return { heightStyle: pct + '%' };
+      const deg = (pct / 100) * 360;
+      const ringBg = `conic-gradient(from -90deg, var(--accent) ${deg}deg, var(--border-strong) ${deg}deg 360deg)`;
+      return { size: size + 'px', ringBg };
     });
     const heroLayerLabel = String(heroLayer + 1);
     const heroPctLabel = String(heroPct);
