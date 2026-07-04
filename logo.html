@@ -30,11 +30,11 @@
   </div>
 
   <!-- LOGO CUSTOMIZER -->
-  <div class="container-narrow">
+  <div class="container-product">
     <a href="/index.html" class="nav-back">← Back to catalog</a>
 
     <sc-if value="{{ logoShowConfirmation }}" hint-placeholder-val="{{ false }}">
-      <div class="confirmation fade-up">
+      <div class="confirmation fade-up" style="max-width:640px;">
         <div class="confirmation-title">Request received ✓</div>
         <div class="confirmation-body">Order ID: {{ confirmation.id }}<br/>We'll follow up by email/phone to confirm final price and details. Payment is not collected on this site.</div>
         <a href="/index.html" class="btn btn-secondary" style="margin-top:20px;">Back to catalog</a>
@@ -45,9 +45,16 @@
       <div class="fade-up">
         <div class="eyebrow">Custom Logos</div>
         <div class="h1" style="font-size:28px; margin-bottom:8px;">Any logo or brand mark</div>
-        <div class="lede" style="font-size:13.5px; margin-bottom:30px;">Sports teams, companies, games. Tell us which one and how to color it.</div>
+        <div class="lede" style="font-size:13.5px; margin-bottom:26px; max-width:640px;">Sports teams, companies, games. Tell us which one and how to color it.</div>
 
-        <div class="card card-pad">
+        <div class="product-layout">
+          <div class="product-media">
+            <div class="product-gallery-main">
+              <img src="/uploads/manchester-united-logo.jpeg" alt="Example custom logo, printed on a keychain"/>
+            </div>
+          </div>
+
+          <div class="card card-pad">
           <div class="section">
             <label class="field-label">Logo or brand name</label>
             <input value="{{ logoBrand }}" onChange="{{ onLogoBrandChange }}" placeholder="e.g. CSK, Apple, Brawl Stars" class="input"/>
@@ -83,6 +90,7 @@
           </div>
 
           <button disabled="{{ logoSubmitDisabled }}" class="btn btn-primary btn-block" onClick="{{ submitLogo }}">Submit order request</button>
+          </div>
         </div>
       </div>
     </sc-if>

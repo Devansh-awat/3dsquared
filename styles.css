@@ -110,6 +110,24 @@ a { color: inherit; }
 .product-gallery-thumb:hover { opacity: 1; }
 .product-gallery-thumb.active { border-color: var(--accent); opacity: 1; }
 
+.product-placeholder {
+  aspect-ratio: 1 / 1; border-radius: var(--radius-lg); border: 1px solid var(--border);
+  background: radial-gradient(ellipse at center, var(--bg-elev-2), var(--bg-sunken));
+  display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden;
+}
+.product-placeholder::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image: radial-gradient(var(--border) 1px, transparent 1px);
+  background-size: 18px 18px;
+  mask-image: radial-gradient(circle at center, black 30%, transparent 75%);
+}
+.product-placeholder svg { position: relative; width: 96px; height: 96px; color: var(--text-dim); }
+.product-placeholder-label {
+  position: absolute; bottom: 18px; left: 0; right: 0; text-align: center;
+  font-size: 11px; color: var(--text-faint); letter-spacing: 0.06em; text-transform: uppercase;
+}
+
 /* ---------- nav ---------- */
 
 .nav {

@@ -30,11 +30,11 @@
   </div>
 
   <!-- FIGURINE -->
-  <div class="container-narrow">
+  <div class="container-product">
     <a href="/index.html" class="nav-back">← Back to catalog</a>
 
     <sc-if value="{{ figShowConfirmation }}" hint-placeholder-val="{{ false }}">
-      <div class="confirmation fade-up">
+      <div class="confirmation fade-up" style="max-width:640px;">
         <div class="confirmation-title">Request received ✓</div>
         <div class="confirmation-body">Order ID: {{ confirmation.id }}<br/>We'll follow up by email/phone to confirm final price and details. Payment is not collected on this site.</div>
         <a href="/index.html" class="btn btn-secondary" style="margin-top:20px;">Back to catalog</a>
@@ -45,9 +45,17 @@
       <div class="fade-up">
         <div class="eyebrow">Action Figures / Mini Figures</div>
         <div class="h1" style="font-size:28px; margin-bottom:8px;">Custom action figure request</div>
-        <div class="lede" style="font-size:13.5px; margin-bottom:30px;">Describe what you'd like — our team confirms final price and details before printing.</div>
+        <div class="lede" style="font-size:13.5px; margin-bottom:26px; max-width:640px;">Describe what you'd like — our team confirms final price and details before printing.</div>
 
-        <div class="card card-pad">
+        <div class="product-layout">
+          <div class="product-media">
+            <div class="product-placeholder">
+              <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="24" cy="11" r="6"/><path d="M14 42 L16 24 Q24 20 32 24 L34 42"/><path d="M16 24 L9 34 M32 24 L39 34"/></svg>
+              <div class="product-placeholder-label">Photo pending — describe your figure below</div>
+            </div>
+          </div>
+
+          <div class="card card-pad">
           <div class="section">
             <label class="field-label">Which figure?</label>
             <input value="{{ figWhat }}" onChange="{{ onFigWhatChange }}" placeholder="e.g. Custom action figure of my dog" class="input"/>
@@ -87,6 +95,7 @@
           <div class="hint" style="margin-bottom:16px;">Final price depends on chosen color.</div>
 
           <button disabled="{{ figSubmitDisabled }}" class="btn btn-primary btn-block" onClick="{{ submitFigurine }}">Submit order request</button>
+          </div>
         </div>
       </div>
     </sc-if>

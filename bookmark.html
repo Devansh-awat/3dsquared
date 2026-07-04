@@ -30,11 +30,11 @@
   </div>
 
   <!-- BOOKMARK CUSTOMIZER -->
-  <div class="container-narrow">
+  <div class="container-product">
     <a href="/index.html" class="nav-back">← Back to catalog</a>
 
     <sc-if value="{{ bmShowConfirmation }}" hint-placeholder-val="{{ false }}">
-      <div class="confirmation fade-up">
+      <div class="confirmation fade-up" style="max-width:640px;">
         <div class="confirmation-title">Order received ✓</div>
         <div class="confirmation-body">Order ID: {{ confirmation.id }}<br/>We'll follow up by email/phone to arrange payment and delivery. Payment is not collected on this site.</div>
         <a href="/index.html" class="btn btn-secondary" style="margin-top:20px;">Back to catalog</a>
@@ -45,9 +45,23 @@
       <div class="fade-up">
         <div class="eyebrow">Custom Bookmark</div>
         <div class="h1" style="font-size:28px; margin-bottom:8px;">Personalize your bookmark</div>
-        <div class="lede" style="font-size:13.5px; margin-bottom:30px;">Pick a shape, engrave your text, and choose colors below.</div>
+        <div class="lede" style="font-size:13.5px; margin-bottom:26px; max-width:640px;">Pick a shape, engrave your text, and choose colors below.</div>
 
-        <div class="card card-pad">
+        <div class="product-layout">
+          <div class="product-media">
+            <div class="product-gallery-main">
+              <img src="{{ bmActivePhoto }}" alt="Custom engraved bookmark example"/>
+            </div>
+            <div class="product-gallery-thumbs">
+              <sc-for list="{{ bmPhotos }}" as="photo" hint-placeholder-count="3">
+                <div class="product-gallery-thumb {{ photo.activeClass }}" onClick="{{ photo.onClick }}">
+                  <img src="{{ photo.url }}" alt="Custom bookmark, alternate view"/>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+
+          <div class="card card-pad">
           <div class="section">
             <label class="field-label">Shape</label>
             <div class="segmented">
@@ -103,6 +117,7 @@
           </div>
 
           <button disabled="{{ bmSubmitDisabled }}" class="btn btn-primary btn-block" onClick="{{ submitBookmark }}">Checkout — pay on delivery/pickup</button>
+          </div>
         </div>
       </div>
     </sc-if>
@@ -128,8 +143,10 @@ class Component extends DCLogic {
   state = {
     confirmation: null,
     bmText: '', bmSize: 'M', bmBaseColor: 'Black', bmTextColor: 'White', bmShape: 'flat', bmShapeDesc: '',
-    bmName: '', bmEmail: '', bmPhone: '',
+    bmName: '', bmEmail: '', bmPhone: '', bmActiveIndex: 0,
   };
+
+  BM_PHOTOS = ['/uploads/bookmark-1.jpeg', '/uploads/bookmark-2.jpeg', '/uploads/bookmark-3.jpeg'];
 
   COLORS = { Red: '#D64545', Blue: '#3B6FD6', Black: '#1B1B1B', White: '#F4F4F2' };
   COLOR_NAMES = ['Red', 'Blue', 'Black', 'White'];
@@ -166,6 +183,12 @@ class Component extends DCLogic {
     }));
     const bmShowShapeDesc = s.bmShape === 'custom';
     const bmTextFieldLabel = bmShowShapeDesc ? 'Text to include (optional)' : 'Engraved text';
+    const bmPhotos = this.BM_PHOTOS.map((url, i) => ({
+      url,
+      activeClass: s.bmActiveIndex === i ? 'active' : '',
+      onClick: () => this.setState({ bmActiveIndex: i }),
+    }));
+    const bmActivePhoto = this.BM_PHOTOS[s.bmActiveIndex] || this.BM_PHOTOS[0];
     const bmBaseSwatches = this.COLOR_NAMES.map(name => ({
       name, hex: this.COLORS[name],
       activeClass: s.bmBaseColor === name ? 'active' : '',
@@ -181,7 +204,7 @@ class Component extends DCLogic {
 
     return {
       bmText: s.bmText, bmName: s.bmName, bmEmail: s.bmEmail, bmPhone: s.bmPhone,
-      bmPrice, bmBaseSwatches, bmTextSwatches,
+      bmPrice, bmBaseSwatches, bmTextSwatches, bmPhotos, bmActivePhoto,
       bmShapeOptions, bmShowShapeDesc, bmTextFieldLabel, bmShapeDesc: s.bmShapeDesc,
       bmShowConfirmation: !!s.confirmation,
       bmShowForm: !s.confirmation,

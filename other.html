@@ -30,11 +30,11 @@
   </div>
 
   <!-- OTHER / CUSTOM REQUEST -->
-  <div class="container-narrow">
+  <div class="container-product">
     <a href="/index.html" class="nav-back">← Back to catalog</a>
 
     <sc-if value="{{ otherShowConfirmation }}" hint-placeholder-val="{{ false }}">
-      <div class="confirmation fade-up">
+      <div class="confirmation fade-up" style="max-width:640px;">
         <div class="confirmation-title">Request received ✓</div>
         <div class="confirmation-body">Order ID: {{ confirmation.id }}<br/>We'll follow up by email/phone to confirm price and details. Payment is not collected on this site.</div>
         <a href="/index.html" class="btn btn-secondary" style="margin-top:20px;">Back to catalog</a>
@@ -45,9 +45,17 @@
       <div class="fade-up">
         <div class="eyebrow">Something else?</div>
         <div class="h1" style="font-size:28px; margin-bottom:8px;">Describe your idea</div>
-        <div class="lede" style="font-size:13.5px; margin-bottom:30px;">Describe what you'd like printed — we'll quote a price and follow up.</div>
+        <div class="lede" style="font-size:13.5px; margin-bottom:26px; max-width:640px;">Describe what you'd like printed — we'll quote a price and follow up.</div>
 
-        <div class="card card-pad">
+        <div class="product-layout">
+          <div class="product-media">
+            <div class="product-placeholder">
+              <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M24 6a11 11 0 0 0-6 20c1.4 1 2 2.3 2 4v2h8v-2c0-1.7.6-3 2-4a11 11 0 0 0-6-20Z"/><path d="M20 38h8M21.5 42h5"/></svg>
+              <div class="product-placeholder-label">Tell us what you're imagining</div>
+            </div>
+          </div>
+
+          <div class="card card-pad">
           <div class="section">
             <label class="field-label">What would you like?</label>
             <textarea value="{{ otherDesc }}" onChange="{{ onOtherDescChange }}" placeholder="Describe the item, size, colors — anything that helps us quote it" rows="5" class="textarea input"></textarea>
@@ -69,6 +77,7 @@
           </div>
 
           <button disabled="{{ otherSubmitDisabled }}" class="btn btn-primary btn-block" onClick="{{ submitOther }}">Submit request</button>
+          </div>
         </div>
       </div>
     </sc-if>

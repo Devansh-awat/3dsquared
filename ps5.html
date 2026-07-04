@@ -30,11 +30,11 @@
   </div>
 
   <!-- PS5 HOLDER -->
-  <div class="container-narrow">
+  <div class="container-product">
     <a href="/index.html" class="nav-back">← Back to catalog</a>
 
     <sc-if value="{{ ps5ShowConfirmation }}" hint-placeholder-val="{{ false }}">
-      <div class="confirmation fade-up">
+      <div class="confirmation fade-up" style="max-width:640px;">
         <div class="confirmation-title">Order received ✓</div>
         <div class="confirmation-body">Order ID: {{ confirmation.id }}<br/>We'll follow up by email/phone to arrange payment and delivery. Payment is not collected on this site.</div>
         <a href="/index.html" class="btn btn-secondary" style="margin-top:20px;">Back to catalog</a>
@@ -45,9 +45,16 @@
       <div class="fade-up">
         <div class="eyebrow">PS5 Controller / Holder</div>
         <div class="h1" style="font-size:28px; margin-bottom:8px;">PS5 Controller / Holder</div>
-        <div class="lede" style="font-size:13.5px; margin-bottom:30px;">Tell us your finish preferences — this fits the standard PS5 controller.</div>
+        <div class="lede" style="font-size:13.5px; margin-bottom:26px; max-width:640px;">Tell us your finish preferences — this fits the standard PS5 controller.</div>
 
-        <div class="card card-pad">
+        <div class="product-layout">
+          <div class="product-media">
+            <div class="product-gallery-main">
+              <img src="/uploads/ps5-holder.webp" alt="PS5 controller holder example"/>
+            </div>
+          </div>
+
+          <div class="card card-pad">
           <div class="section">
             <label class="field-label">Describe the design & colors for each part</label>
             <textarea value="{{ ps5Theme }}" onChange="{{ onPs5ThemeChange }}" placeholder="e.g. Marvel theme — base: red, accents: gold, logo: black. Describe as much detail as you can per part." rows="5" class="textarea input"></textarea>
@@ -70,6 +77,7 @@
           <div class="hint" style="margin-bottom:16px;">Final price depends on the complexity of the holder — quoted after we review your design.</div>
 
           <button disabled="{{ ps5SubmitDisabled }}" class="btn btn-primary btn-block" onClick="{{ submitPs5 }}">Submit order request</button>
+          </div>
         </div>
       </div>
     </sc-if>
