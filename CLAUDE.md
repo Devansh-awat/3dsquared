@@ -9,8 +9,13 @@
 ## What this is
 
 A 3D-printing storefront: customers configure a product (keychain, bookmark, keycap fidget toy,
-PS5 holder, figurine, logo, or a free-form request), submit an order (no payment collected —
-"pay on delivery/pickup"), and staff review/download print files from a password-gated panel.
+PS5 holder, figurine, logo, articulated finger extensions, or a free-form request), submit an
+order (no payment collected — "pay on delivery/pickup"), and staff review/download print files
+from a password-gated panel.
+
+A companion site for the same business (built by a friend, separate React SPA, also on Vercel)
+exists at 3d-squared.vercel.app — its real product photos (e.g. the articulated hand) are a
+legitimate source to reuse here since it's the same business, not a competitor.
 
 Originally generated as a Claude Design (`claude.ai/design`) project, then implemented here as a
 static site plus a small Vercel serverless backend.
@@ -19,7 +24,8 @@ static site plus a small Vercel serverless backend.
 
 - **Frontend — one real page per route, not a single-page app.** Each of `index.html` (catalog),
   `keychain.html`, `bookmark.html`, `keycap.html`, `ps5.html`, `figurine.html`, `logo.html`,
-  `other.html`, `staff.html` is its own standalone document with its own `<x-dc>` template and its
+  `hand.html` (articulated finger extensions), `other.html`, `staff.html` is its own standalone
+  document with its own `<x-dc>` template and its
   own `Component extends DCLogic` class — navigation between them is plain `<a href>` full page
   loads, so URLs are real/shareable/bookmarkable and back/forward work. This used to be one
   monolithic `index.html` that swapped "pages" via JS state; it was split apart deliberately.
@@ -86,8 +92,10 @@ static site plus a small Vercel serverless backend.
 - **No seed/demo data**: the `orders` table only ever holds real customer submissions. An earlier
   version of this repo seeded 3 fake demo orders (PS5/logo/bookmark) — those were removed since
   they were never actually asked for; don't re-add synthetic orders without being asked. The
-  `uploads/` photos (`ps5-holder.webp`, `manchester-united-logo.jpeg`, `bookmark.jpeg`) are still
-  used legitimately as real product photos on the catalog page (`index.html`) — keep those.
+  `uploads/` photos (`ps5-holder.webp`, `manchester-united-logo.jpeg`, `bookmark.jpeg`,
+  `articulated-hand.jpeg`) are still used legitimately as real product photos on the catalog page
+  (`index.html`) — keep those. `articulated-hand.jpeg` was pulled from the companion
+  3d-squared.vercel.app site's `/ProductPictures/` (same business, so fair game — see above).
 
 ## Local setup
 
