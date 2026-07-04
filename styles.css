@@ -306,7 +306,7 @@ a { color: inherit; }
 }
 .print-nozzle {
   position: absolute; bottom: 100%; transform: translate(-50%, 0); margin-bottom: 4px;
-  display: flex; flex-direction: column; align-items: center;
+  display: flex; flex-direction: column; align-items: center; z-index: 5;
 }
 .print-nozzle svg { display: block; filter: drop-shadow(0 0 5px var(--accent-soft)); }
 .print-readout {
